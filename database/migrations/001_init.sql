@@ -1,0 +1,46 @@
+-- Database: posyandu_lansia (ubah sesuai .env)
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nama VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  no_telp VARCHAR(30) DEFAULT NULL,
+  role ENUM('admin','petugas') NOT NULL DEFAULT 'petugas',
+  password_hash VARCHAR(255) NOT NULL,
+  aktif TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS lansia (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_unik VARCHAR(16) NOT NULL UNIQUE,
+  nama_lengkap VARCHAR(150) NOT NULL,
+  tgl_lahir DATE NOT NULL,
+  jk ENUM('L','P') NOT NULL,
+  alamat VARCHAR(255) NOT NULL,
+  no_telp VARCHAR(30) NOT NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS pemeriksaan (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  lansia_id INT NOT NULL,
+  petugas_id INT NULL,
+  tgl_periksa DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  tinggi_cm TINYINT UNSIGNED NULL,
+  berat_kg DECIMAL(5,2) NULL,
+  sistolik SMALLINT UNSIGNED NULL,
+  diastolik SMALLINT UNSIGNED NULL,
+  bmi DECIMAL(4,1) NULL,
+  asam_urat_mgdl DECIMAL(4,1) NULL,
+  gula_mgdl SMALLINT UNSIGNED NULL,
+  kolesterol_mgdl SMALLINT UNSIGNED NULL,
+  catatan VARCHAR(255) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_pem_lansia FOREIGN KEY (lansia_id) REFERENCES lansia(id) ON DELETE CASCADE,
+  CONSTRAINT fk_pem_petugas FOREIGN KEY (petugas_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_pem_lansia_tgl (lansia_id, tgl_periksa)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
