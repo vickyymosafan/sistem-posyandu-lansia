@@ -14,5 +14,13 @@ class Str
         }
         return $out;
     }
-}
 
+    // Generate patient ID with prefix 'pasien' + YYYYMMDD + 2 base62 chars (total length 16)
+    public static function patientId(?\DateTimeInterface $when = null): string
+    {
+        $d = ($when ?: new \DateTime())->format('Ymd');
+        // Two base62 characters for up to 3844 combinations per day
+        $suffix = self::randomBase62(2);
+        return 'pasien' . $d . $suffix; // 6 + 8 + 2 = 16 chars fits schema
+    }
+}

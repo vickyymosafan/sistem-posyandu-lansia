@@ -72,9 +72,9 @@ class LansiaController extends Controller
         $pdo = Database::pdo();
         $pdo->beginTransaction();
         try {
-            // generate unique kode
+            // generate unique kode with format: 'pasien' + YYYYMMDD + 2 base62 chars (length 16)
             do {
-                $kode = Str::randomBase62(10);
+                $kode = Str::patientId();
             } while (Lansia::findByKode($kode));
 
             $input['id_unik'] = $kode;

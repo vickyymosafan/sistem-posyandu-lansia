@@ -36,7 +36,7 @@
                type="text" 
                id="kode" 
                name="kode" 
-               placeholder="Contoh: ABC123XYZ" 
+               placeholder="Contoh: pasien20250101AB" 
                required 
                autocomplete="off"
                spellcheck="false"
