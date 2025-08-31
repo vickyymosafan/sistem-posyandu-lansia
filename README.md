@@ -1,39 +1,68 @@
-Sistem Posyandu Lansia - PHP MVC Skeleton
+Sistem Posyandu Lansia — PHP MVC Mini App
 
-Ringkas: Kerangka awal aplikasi sesuai SRS (R1-R6) menggunakan PHP (MVC), MySQL (PDO), dan TailwindCSS. Identifikasi lansia memakai ID Unik (tanpa QR/Barcode).
+Ringkasan: Aplikasi sederhana berbasis PHP (pola MVC) dan MySQL untuk pendaftaran lansia, pencarian via ID Unik, pencatatan pemeriksaan fisik/kesehatan, dan tampilan profil + riwayat. UI menggunakan TailwindCSS via CDN, tanpa dependensi tambahan.
 
-Fitur yang tersedia (awal):
-- Routing dasar (Front Controller + Router sederhana)
-- Halaman pendaftaran lansia (form + validasi client/server)
-- Simpan data ke MySQL (PDO) dan hasilkan ID Unik (`id_unik`)
-- Halaman profil menampilkan ID Unik (bisa disalin)
-- Halaman cari ID Unik
+Fitur Utama
+- Pendaftaran lansia dengan validasi server dan client.
+- ID Unik otomatis: format `pasienYYYYMMDDXX` (contoh: `pasien20250101AB`).
+- Halaman profil lansia dengan salin ID, serta riwayat pemeriksaan terbaru.
+- Form pemeriksaan fisik (tinggi, berat, sistolik, diastolik) dengan kalkulasi BMI + kategori.
+- Form pemeriksaan kesehatan (asam urat, gula darah + tipe, kolesterol total) beserta klasifikasi otomatis.
+- Pencarian cepat berdasarkan ID Unik.
+- Router ringan dan tampilan terpisah per halaman.
 
-Persiapan lingkungan:
-1) Salin `.env.example` menjadi `.env` lalu isi kredensial DB Anda.
-2) Buat database MySQL sesuai `.env`.
-3) Jalankan migrasi SQL berurutan: import `database/migrations/001_init.sql`, `002_add_lipid_profile.sql`, `003_add_gula_tipe.sql`, `004_add_gula_kategori.sql`, dan `005_drop_lipid_details.sql` (menghapus LDL/HDL/Trigliserida).
-4) Tidak perlu library QR. Sistem menggunakan ID Unik saja.
+Persyaratan
+- PHP 8.1+ (disarankan 8.2).
+- MySQL 8+ (atau kompatibel), akses user/DB sudah tersedia.
+- Tidak perlu Composer; Tailwind diambil via CDN.
 
-Menjalankan aplikasi (contoh):
-- Dev server built-in PHP: `php -S localhost:8000 -t public` (pastikan `public/` sebagai docroot).
+Langkah Instalasi
+1) Salin `.env.example` menjadi `.env` dan sesuaikan nilai berikut:
+   - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`
+   - `APP_URL` (mis. `http://localhost:8000`), `TIMEZONE`
+2) Buat database sesuai `DB_NAME`.
+3) Import skema `database/posyandu.sql` ke database tersebut (berisi seluruh tabel dan enum yang dipakai aplikasi).
+4) Jalankan server dev PHP: `php -S localhost:8000 -t public` lalu buka `http://localhost:8000`.
 
-Struktur folder:
-- `public/` Front controller, asset JS/CSS, .htaccess
-- `app/Core/` Router, Controller, View, Database, Helpers
-- `app/Controllers/` Controller aplikasi
-- `app/Models/` Model PDO
-- `app/Views/` Template PHP (Tailwind via CDN)
-- `config/` Konfigurasi
-- `database/migrations/` DDL SQL
+Rute Aplikasi (ringkas)
+- GET `/`           → Beranda.
+- GET `/lansia`     → Daftar lansia (paginasi + pencarian).
+- GET `/lansia/create` → Form pendaftaran.
+- POST `/lansia`    → Simpan pendaftaran (buat ID Unik).
+- GET `/lansia/{id_unik}` → Profil lansia + riwayat pemeriksaan.
+- GET `/lansia/{id_unik}/pemeriksaan` → Form pemeriksaan gabungan.
+- POST `/lansia/{id_unik}/pemeriksaan` → Simpan pemeriksaan (gabungan).
+- POST `/lansia/{id_unik}/pemeriksaan/fisik` → Simpan bagian fisik saja.
+- POST `/lansia/{id_unik}/pemeriksaan/kesehatan` → Simpan bagian kesehatan saja.
+- GET `/find` dan POST `/find` → Cari profil berdasarkan ID Unik.
 
-Catatan keamanan & praktik baik:
-- Gunakan session aman (`cookie_httponly`, `secure` jika HTTPS), CSRF token untuk form sensitif.
-- Semua query menggunakan prepared statements (lihat `app/Core/Database.php`).
-- Validasi ganda: client-side (JS) dan server-side (PHP) agar konsisten.
+Format ID Unik
+- Pola: `pasien` + `YYYYMMDD` + 2 karakter Base62 (total 16 karakter).
+- Implementasi generator: `app/Core/Str.php:18` (`patientId()`).
+- Dipakai saat pendaftaran: `app/Controllers/LansiaController.php:75`.
+- Unik per-row; jika tabrakan (sangat jarang), generator akan mengulang.
 
-Roadmap next:
-- Form pemeriksaan fisik & kesehatan + validasi range
-- (Opsional) Riwayat dan tren visual dapat ditambahkan kemudian
-- Autentikasi petugas/admin
-- Peningkatan aksesibilitas & haptic feedback
+Struktur Proyek
+- `public/` front controller (`public/index.php`) dan `.htaccess`.
+- `app/Core/` util inti: `Router`, `Controller`, `View`, `Database`, `Env`, `Str`.
+- `app/Controllers/` controller halaman (Home, Lansia, Pemeriksaan, Find).
+- `app/Models/` akses data dengan PDO (prepared statements, tanpa ORM).
+- `app/Views/` template PHP dengan Tailwind via CDN.
+- `config/` bootstrap konfigurasi (`config/config.php`).
+- `database/posyandu.sql` skema database siap impor.
+
+Keamanan & Praktik Baik
+- PDO dengan prepared statements (`app/Core/Database.php`).
+- Validasi di server (PHP) dan umpan balik real‑time di klien (JS) pada form.
+- Set `TIMEZONE` dan `APP_URL` sesuai lingkungan. Gunakan HTTPS di produksi dan aktifkan cookie yang aman.
+
+Pengembangan
+- Jalankan server dev: `php -S localhost:8000 -t public`.
+- Ubah ambang/kategori pemeriksaan di controller:
+  - Tekanan darah & BMI: `app/Controllers/PemeriksaanController.php`.
+  - Gula darah, kolesterol, asam urat: file yang sama (bagian `storeKesehatan`/`store`).
+- Ubah format ID jika dibutuhkan di `app/Core/Str.php`.
+
+Catatan
+- Aplikasi tidak memakai QR/Barcode; seluruh navigasi berbasis ID Unik.
+- Jika men-deploy di server web (Nginx/Apache), arahkan docroot ke folder `public/`.
