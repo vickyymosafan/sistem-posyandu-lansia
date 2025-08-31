@@ -3,6 +3,15 @@
 function badgeJK($jk){ return $jk==='L' ? 'Laki-laki' : 'Perempuan'; }
 ?>
 <div class="space-y-4">
+  <!-- Back Button -->
+  <div>
+    <a href="/" onclick="haptic(); if (history.length>1) { history.back(); return false; }" class="inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+      </svg>
+      Kembali
+    </a>
+  </div>
   <div class="flex items-center justify-between gap-4 flex-wrap">
     <div>
       <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Daftar Lansia</h1>

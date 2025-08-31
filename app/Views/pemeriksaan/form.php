@@ -11,6 +11,17 @@ function ferr($e,$f){
 }
 ?>
 <div class="space-y-6">
+  <!-- Back Button -->
+  <div class="flex items-center justify-between">
+    <a href="/lansia/<?= htmlspecialchars($l['id_unik']) ?>" 
+       class="inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+       onclick="haptic()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+      </svg>
+      Kembali ke Profil
+    </a>
+  </div>
   <?php if (!empty($success)): ?>
     <div class="form-success p-4 bg-green-50 border border-green-200 rounded-lg">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0 mt-0.5">
