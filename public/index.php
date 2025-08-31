@@ -42,6 +42,7 @@ $router->get('/lansia/create', [App\Controllers\LansiaController::class, 'create
 $router->post('/lansia', [App\Controllers\LansiaController::class, 'store']);
 $router->get('/lansia/{kode}', [App\Controllers\LansiaController::class, 'show']);
 $router->get('/lansia/{kode}/pemeriksaan', [App\Controllers\PemeriksaanController::class, 'form']);
+$router->post('/lansia/{kode}/pemeriksaan', [App\Controllers\PemeriksaanController::class, 'store']);
 $router->post('/lansia/{kode}/pemeriksaan/fisik', [App\Controllers\PemeriksaanController::class, 'storeFisik']);
 $router->post('/lansia/{kode}/pemeriksaan/kesehatan', [App\Controllers\PemeriksaanController::class, 'storeKesehatan']);
 $router->get('/find', [App\Controllers\FindController::class, 'index']);

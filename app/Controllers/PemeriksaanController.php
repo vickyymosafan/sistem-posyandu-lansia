@@ -39,6 +39,7 @@ class PemeriksaanController extends Controller
         $v = new Validator($input);
         // Ranges
         $this->numRange($v, 'tinggi_cm', 100, 200, 'Tinggi badan (cm)');
+        // Berat badan harus bilangan bulat
         $this->numRange($v, 'berat_kg', 30, 150, 'Berat badan (kg)');
         $this->numRange($v, 'sistolik', 70, 250, 'Tekanan darah sistolik (mmHg)');
         $this->numRange($v, 'diastolik', 40, 150, 'Tekanan darah diastolik (mmHg)');
@@ -51,7 +52,8 @@ class PemeriksaanController extends Controller
         }
 
         $tinggi = (int)$input['tinggi_cm'];
-        $berat = (float)$input['berat_kg'];
+        // Berat badan disimpan sebagai bilangan bulat (kg)
+        $berat = (int)$input['berat_kg'];
         $bmi = round($berat / pow($tinggi/100, 2), 1);
 
         // Kategori BMI (pakem Indonesia/Asia Pasifik)
@@ -85,7 +87,9 @@ class PemeriksaanController extends Controller
             $bpEnum = 'NORMAL';
         }
 
-        Pemeriksaan::upsertForToday((int)$l['id'], [
+        // Catat sebagai entry baru setiap kali disimpan (meskipun di hari yang sama)
+        Pemeriksaan::create([
+            'lansia_id' => (int)$l['id'],
             'tinggi_cm' => $tinggi,
             'berat_kg' => $berat,
             'sistolik' => $sys,
@@ -115,7 +119,7 @@ class PemeriksaanController extends Controller
 
         $_SESSION['success'] = 'Pemeriksaan fisik tersimpan. BMI: ' . $bmi . ($bmiLabel ? ' (' . $bmiLabel . ')' : '')
             . '. Tekanan darah: ' . $sys . '/' . $dia . ' mmHg (' . $bpLabel . ')';
-        $this->redirect('/lansia/' . $kode . '/pemeriksaan');
+        $this->redirect('/lansia/' . $kode . '#riwayat');
         return;
     }
 
@@ -171,13 +175,15 @@ class PemeriksaanController extends Controller
         $kolCatEnum = $kolTotal >= 240 ? 'TINGGI' : ($kolTotal >= 200 ? 'BATAS_TINGGI' : 'NORMAL');
 
         // Keterangan asam urat berdasar jenis kelamin
-        $asam = (float)$input['asam_urat_mgdl'];
+        $asam = (float)str_replace(',', '.', (string)$input['asam_urat_mgdl']);
         $low = ($l['jk'] ?? 'L') === 'L' ? 3.4 : 2.4;
         $high = ($l['jk'] ?? 'L') === 'L' ? 7.0 : 6.0;
         $asamCat = $asam < $low ? 'Rendah' : ($asam > $high ? 'Tinggi' : 'Normal');
         $asamCatEnum = $asam < $low ? 'RENDAH' : ($asam > $high ? 'TINGGI' : 'NORMAL');
 
-        Pemeriksaan::upsertForToday((int)$l['id'], [
+        // Catat sebagai entry baru setiap kali disimpan (meskipun di hari yang sama)
+        Pemeriksaan::create([
+            'lansia_id' => (int)$l['id'],
             'asam_urat_mgdl' => (float)$input['asam_urat_mgdl'],
             'asam_urat_kategori' => $asamCatEnum,
             'gula_mgdl' => (int)$input['gula_mgdl'],
@@ -198,8 +204,143 @@ class PemeriksaanController extends Controller
         $parts[] = 'Kolesterol Total: ' . $kolTotal . ' mg/dL (' . $kolCat . ')';
         $parts[] = 'Asam Urat: ' . $asam . ' mg/dL (' . $asamCat . ')';
         $_SESSION['success'] = 'Pemeriksaan kesehatan tersimpan. ' . implode('; ', $parts);
-        $this->redirect('/lansia/' . $kode . '/pemeriksaan');
+        $this->redirect('/lansia/' . $kode . '#riwayat');
         return;
+    }
+
+    // Combined submit: require both Fisik and Kesehatan filled in one go
+    public function store(string $kode): void
+    {
+        $l = Lansia::findByKode($kode);
+        if (!$l) { http_response_code(404); echo 'Lansia tidak ditemukan'; return; }
+
+        // Collect inputs
+        $fisik = [
+            'tinggi_cm' => trim((string)($_POST['tinggi_cm'] ?? '')),
+            'berat_kg' => trim((string)($_POST['berat_kg'] ?? '')),
+            'sistolik' => trim((string)($_POST['sistolik'] ?? '')),
+            'diastolik' => trim((string)($_POST['diastolik'] ?? '')),
+        ];
+        $kes = [
+            'asam_urat_mgdl' => trim((string)($_POST['asam_urat_mgdl'] ?? '')),
+            'gula_mgdl' => trim((string)($_POST['gula_mgdl'] ?? '')),
+            'gula_tipe' => trim((string)($_POST['gula_tipe'] ?? '')),
+            'kolesterol_total_mgdl' => trim((string)($_POST['kolesterol_total_mgdl'] ?? '')),
+        ];
+
+        // Validate: all must be present
+        $vf = new Validator($fisik);
+        $this->numRange($vf, 'tinggi_cm', 100, 200, 'Tinggi badan (cm)');
+        // Berat badan harus bilangan bulat
+        $this->numRange($vf, 'berat_kg', 30, 150, 'Berat badan (kg)');
+        $this->numRange($vf, 'sistolik', 70, 250, 'Tekanan darah sistolik (mmHg)');
+        $this->numRange($vf, 'diastolik', 40, 150, 'Tekanan darah diastolik (mmHg)');
+
+        $vk = new Validator($kes);
+        $vk->required('gula_tipe', 'Tipe pemeriksaan gula')->enum('gula_tipe', ['puasa','sewaktu','2jpp'], 'Tipe pemeriksaan gula');
+        $this->numRange($vk, 'asam_urat_mgdl', 2.0, 15.0, 'Asam urat (mg/dL)', true);
+        $this->numRange($vk, 'gula_mgdl', 50, 500, 'Gula darah (mg/dL)');
+        $this->numRange($vk, 'kolesterol_total_mgdl', 100, 400, 'Kolesterol total (mg/dL)');
+
+        if (!$vf->passes() || !$vk->passes()) {
+            $_SESSION['errors_fisik'] = $vf->errors();
+            $_SESSION['errors_kesehatan'] = $vk->errors();
+            $_SESSION['old_fisik'] = $fisik;
+            $_SESSION['old_kesehatan'] = $kes;
+            $_SESSION['success'] = null;
+            $this->redirect('/lansia/' . $kode . '/pemeriksaan');
+            return;
+        }
+
+        // Compute derived values (BMI, BP category, glucose/kolesterol/asam urat categories)
+        $tinggi = (int)$fisik['tinggi_cm'];
+        $berat = (int)$fisik['berat_kg'];
+        $bmi = round($berat / pow($tinggi/100, 2), 1);
+        $bmiKategori = null;
+        if ($bmi < 17.0) { $bmiKategori = 'SANGAT_KURANG'; }
+        elseif ($bmi < 18.5) { $bmiKategori = 'KURANG'; }
+        elseif ($bmi <= 25.0) { $bmiKategori = 'NORMAL'; }
+        elseif ($bmi <= 27.0) { $bmiKategori = 'LEBIH'; }
+        elseif ($bmi <= 30.0) { $bmiKategori = 'OBESITAS_I'; }
+        else { $bmiKategori = 'OBESITAS_II'; }
+
+        $sys = (int)$fisik['sistolik'];
+        $dia = (int)$fisik['diastolik'];
+        $bpEnum = 'NORMAL';
+        if ($sys > 180 || $dia > 120) { $bpEnum = 'KRISIS_HIPERTENSI'; }
+        elseif ($sys >= 140 || $dia >= 90) { $bpEnum = 'HIPERTENSI_TAHAP_2'; }
+        elseif ($sys >= 130 || ($dia >= 80 && $dia <= 89)) { $bpEnum = 'HIPERTENSI_TAHAP_1'; }
+        elseif ($sys >= 120 && $sys <= 129 && $dia < 80) { $bpEnum = 'BATAS_WASPADA'; }
+        else { $bpEnum = 'NORMAL'; }
+
+        $gulaVal = (int)$kes['gula_mgdl'];
+        $gulaTipe = $kes['gula_tipe'];
+        $gulaKategori = null;
+        if ($gulaTipe === 'puasa') {
+            if ($gulaVal >= 126) { $gulaKategori = 'DIABETES'; }
+            elseif ($gulaVal >= 100) { $gulaKategori = 'PRA_DIABETES'; }
+            else { $gulaKategori = 'NORMAL'; }
+        } elseif ($gulaTipe === '2jpp') {
+            if ($gulaVal >= 200) { $gulaKategori = 'DIABETES'; }
+            elseif ($gulaVal >= 140) { $gulaKategori = 'PRA_DIABETES'; }
+            else { $gulaKategori = 'NORMAL'; }
+        } elseif ($gulaTipe === 'sewaktu') {
+            if ($gulaVal >= 200) { $gulaKategori = 'DIABETES'; }
+            else { $gulaKategori = 'NORMAL'; }
+        }
+
+        $kolTotal = (int)$kes['kolesterol_total_mgdl'];
+        $kolCatEnum = $kolTotal >= 240 ? 'TINGGI' : ($kolTotal >= 200 ? 'BATAS_TINGGI' : 'NORMAL');
+
+        $asam = (float)str_replace(',', '.', (string)$kes['asam_urat_mgdl']);
+        $low = ($l['jk'] ?? 'L') === 'L' ? 3.4 : 2.4;
+        $high = ($l['jk'] ?? 'L') === 'L' ? 7.0 : 6.0;
+        $asamCatEnum = $asam < $low ? 'RENDAH' : ($asam > $high ? 'TINGGI' : 'NORMAL');
+
+        // Insert a single new row
+        Pemeriksaan::create([
+            'lansia_id' => (int)$l['id'],
+            'tinggi_cm' => (int)$fisik['tinggi_cm'],
+            'berat_kg' => (int)$fisik['berat_kg'],
+            'sistolik' => $sys,
+            'diastolik' => $dia,
+            'tekanan_darah_kategori' => $bpEnum,
+            'bmi' => $bmi,
+            'bmi_kategori' => $bmiKategori,
+            'asam_urat_mgdl' => $asam,
+            'asam_urat_kategori' => $asamCatEnum,
+            'gula_mgdl' => $gulaVal,
+            'gula_tipe' => $gulaTipe,
+            'gula_kategori' => $gulaKategori,
+            'kolesterol_total_mgdl' => $kolTotal,
+            'kolesterol_total_kategori' => $kolCatEnum,
+        ]);
+
+        // Compose success message
+        $mapLabel = ['puasa' => 'GDP (Puasa)', 'sewaktu' => 'GDS (Sewaktu)', '2jpp' => '2 Jam Setelah Makan'];
+        $gtLabel = $mapLabel[$gulaTipe] ?? $gulaTipe;
+        $bpLabelMap = [
+            'NORMAL' => 'Normal',
+            'BATAS_WASPADA' => 'Batas Waspada (Elevated)',
+            'HIPERTENSI_TAHAP_1' => 'Hipertensi Tahap 1',
+            'HIPERTENSI_TAHAP_2' => 'Hipertensi Tahap 2',
+            'KRISIS_HIPERTENSI' => 'Krisis Hipertensi',
+        ];
+        $bmiLabelMap = [
+            'SANGAT_KURANG' => 'Berat Badan Sangat Kurang',
+            'KURANG' => 'Berat Badan Kurang',
+            'NORMAL' => 'Berat Badan Normal',
+            'LEBIH' => 'Kelebihan Berat Badan (Overweight)',
+            'OBESITAS_I' => 'Obesitas Tingkat I',
+            'OBESITAS_II' => 'Obesitas Tingkat II',
+        ];
+        $_SESSION['success'] = 'Pemeriksaan tersimpan. BMI: ' . $bmi . ' (' . ($bmiLabelMap[$bmiKategori] ?? $bmiKategori) . '); '
+            . 'TD: ' . $sys . '/' . $dia . ' (' . ($bpLabelMap[$bpEnum] ?? $bpEnum) . '); '
+            . 'Gula: ' . $gulaVal . ' mg/dL (' . $gtLabel . ' => ' . $gulaKategori . '); '
+            . 'Kolesterol: ' . $kolTotal . ' mg/dL; '
+            . 'Asam Urat: ' . $asam . ' mg/dL.';
+
+        $this->redirect('/lansia/' . $kode . '#riwayat');
     }
 
     private function numRange(Validator $v, string $field, $min, $max, string $label, bool $isFloat = false, bool $required = true): void
@@ -211,7 +352,7 @@ class PemeriksaanController extends Controller
         }
 
         // Numeric pattern
-        $pattern = $isFloat ? '/^\d+(?:\.\d+)?$/' : '/^\d+$/';
+        $pattern = $isFloat ? '/^\d+(?:[\.,]\d+)?$/' : '/^\d+$/';
         if ($required) {
             $v->required($field, $label);
         }
@@ -220,7 +361,7 @@ class PemeriksaanController extends Controller
         $errs = $v->errors();
         if (!isset($errs[$field])) {
             if ($raw !== null) {
-                $num = $isFloat ? (float)$raw : (int)$raw;
+                $num = $isFloat ? (float)str_replace(',', '.', (string)$raw) : (int)$raw;
                 if ($num < $min || $num > $max) {
                     $v->regex($field, '/a^/', sprintf('%s harus antara %s dan %s', $label, $min, $max));
                 }

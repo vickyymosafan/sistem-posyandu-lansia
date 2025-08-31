@@ -93,6 +93,162 @@ try {
         </div>
       </div>
       
+      <!-- Riwayat Pemeriksaan -->
+      <div id="riwayat" class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Riwayat Pemeriksaan</h2>
+        <?php if (empty($riwayat ?? [])): ?>
+          <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">Belum ada riwayat pemeriksaan.</div>
+        <?php else: ?>
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full table-modern">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>TD (mmHg)</th>
+                  <th>BMI</th>
+                  <th>Gula</th>
+                  <th>Kolesterol Total</th>
+                  <th>Asam Urat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach(($riwayat ?? []) as $row): ?>
+                  <tr>
+                    <td class="text-sm text-gray-700">
+                      <time datetime="<?= htmlspecialchars($row['tgl_periksa']) ?>">
+                        <?= htmlspecialchars((new DateTime($row['tgl_periksa']))->format('d M Y H:i')) ?>
+                      </time>
+                    </td>
+                    <td class="text-sm text-gray-800">
+                      <?php if ($row['sistolik'] && $row['diastolik']): ?>
+                        <?= (int)$row['sistolik'] ?>/<?= (int)$row['diastolik'] ?>
+                        <?php if ($row['tekanan_darah_kategori']): ?>
+                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <?= htmlspecialchars($row['tekanan_darah_kategori']) ?>
+                          </span>
+                        <?php endif; ?>
+                      <?php else: ?>
+                        -
+                      <?php endif; ?>
+                    </td>
+                    <td class="text-sm text-gray-800">
+                      <?php if ($row['bmi']): ?>
+                        <?= htmlspecialchars($row['bmi']) ?>
+                        <?php if ($row['bmi_kategori']): ?>
+                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            <?= htmlspecialchars($row['bmi_kategori']) ?>
+                          </span>
+                        <?php endif; ?>
+                      <?php else: ?>-
+                      <?php endif; ?>
+                    </td>
+                    <td class="text-sm text-gray-800">
+                      <?php if ($row['gula_mgdl']): ?>
+                        <?= (int)$row['gula_mgdl'] ?> mg/dL
+                        <?php if ($row['gula_tipe']): ?>
+                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            <?= htmlspecialchars(strtoupper($row['gula_tipe'])) ?>
+                          </span>
+                        <?php endif; ?>
+                        <?php if ($row['gula_kategori']): ?>
+                          <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            <?= htmlspecialchars($row['gula_kategori']) ?>
+                          </span>
+                        <?php endif; ?>
+                      <?php else: ?>-
+                      <?php endif; ?>
+                    </td>
+                    <td class="text-sm text-gray-800">
+                      <?php if ($row['kolesterol_total_mgdl'] !== null && $row['kolesterol_total_mgdl'] !== ''): ?>
+                        <?= (int)$row['kolesterol_total_mgdl'] ?> mg/dL
+                        <?php if ($row['kolesterol_total_kategori']): ?>
+                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            <?= htmlspecialchars($row['kolesterol_total_kategori']) ?>
+                          </span>
+                        <?php endif; ?>
+                      <?php else: ?>-
+                      <?php endif; ?>
+                    </td>
+                    <td class="text-sm text-gray-800">
+                      <?php if ($row['asam_urat_mgdl']): ?>
+                        <?= htmlspecialchars($row['asam_urat_mgdl']) ?> mg/dL
+                        <?php if ($row['asam_urat_kategori']): ?>
+                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <?= htmlspecialchars($row['asam_urat_kategori']) ?>
+                          </span>
+                        <?php endif; ?>
+                      <?php else: ?>-
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile list -->
+          <div class="md:hidden space-y-3">
+            <?php foreach(($riwayat ?? []) as $row): ?>
+              <div class="p-4 border border-gray-200 rounded-lg bg-white">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="text-sm font-semibold text-gray-900">
+                    <?= htmlspecialchars((new DateTime($row['tgl_periksa']))->format('d M Y H:i')) ?>
+                  </div>
+                  <?php if ($row['sistolik'] && $row['diastolik']): ?>
+                    <div class="text-right">
+                      <div class="text-xs text-gray-700">TD: <?= (int)$row['sistolik'] ?>/<?= (int)$row['diastolik'] ?></div>
+                      <?php if (!empty($row['tekanan_darah_kategori'])): ?>
+                        <span class="inline-flex mt-1 items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
+                          <?= htmlspecialchars($row['tekanan_darah_kategori']) ?>
+                        </span>
+                      <?php endif; ?>
+                    </div>
+                  <?php endif; ?>
+                </div>
+                <div class="mt-2 text-xs text-gray-700 grid grid-cols-2 gap-2">
+                  <div>
+                    BMI: <?= $row['bmi'] ? htmlspecialchars($row['bmi']) : '-' ?>
+                    <?php if (!empty($row['bmi_kategori'])): ?>
+                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-800 whitespace-nowrap">
+                        <?= htmlspecialchars($row['bmi_kategori']) ?>
+                      </span>
+                    <?php endif; ?>
+                  </div>
+                  <div>
+                    Gula: <?= $row['gula_mgdl'] ? (int)$row['gula_mgdl'] . ' mg/dL' : '-' ?>
+                    <?php if (!empty($row['gula_tipe'])): ?>
+                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 whitespace-nowrap">
+                        <?= htmlspecialchars(strtoupper($row['gula_tipe'])) ?>
+                      </span>
+                    <?php endif; ?>
+                    <?php if (!empty($row['gula_kategori'])): ?>
+                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 whitespace-nowrap">
+                        <?= htmlspecialchars($row['gula_kategori']) ?>
+                      </span>
+                    <?php endif; ?>
+                  </div>
+                  <div>
+                    Kol: <?= ($row['kolesterol_total_mgdl']!==null && $row['kolesterol_total_mgdl']!=='') ? (int)$row['kolesterol_total_mgdl'] . ' mg/dL' : '-' ?>
+                    <?php if (!empty($row['kolesterol_total_kategori'])): ?>
+                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-100 text-indigo-800 whitespace-nowrap">
+                        <?= htmlspecialchars($row['kolesterol_total_kategori']) ?>
+                      </span>
+                    <?php endif; ?>
+                  </div>
+                  <div>
+                    Asam: <?= $row['asam_urat_mgdl'] ? htmlspecialchars($row['asam_urat_mgdl']) . ' mg/dL' : '-' ?>
+                    <?php if (!empty($row['asam_urat_kategori'])): ?>
+                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 whitespace-nowrap">
+                        <?= htmlspecialchars($row['asam_urat_kategori']) ?>
+                      </span>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+
       <!-- Action Section -->
       <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
         <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Tindakan</h2>

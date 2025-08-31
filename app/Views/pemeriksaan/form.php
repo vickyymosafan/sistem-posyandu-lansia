@@ -64,6 +64,7 @@ function ferr($e,$f){
   </div>
 
   <!-- Responsive Grid Layout for Forms -->
+  <form method="post" action="/lansia/<?= htmlspecialchars($l['id_unik']) ?>/pemeriksaan" onsubmit="return valAll(this)">
   <div class="grid lg:grid-cols-2 gap-6">
     <!-- Physical Examination Form -->
     <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-card hover:shadow-card-hover transition-shadow duration-200">
@@ -74,7 +75,7 @@ function ferr($e,$f){
         Pemeriksaan Fisik
       </h2>
       
-      <form method="post" action="/lansia/<?= htmlspecialchars($l['id_unik']) ?>/pemeriksaan/fisik" class="space-y-6" onsubmit="return valFisik(this)">
+      <div class="space-y-6">
         <!-- Body Measurements Grid -->
         <div class="grid sm:grid-cols-2 gap-4">
           <div class="form-group">
@@ -99,16 +100,15 @@ function ferr($e,$f){
             <label class="form-label required" for="berat_kg">Berat Badan</label>
             <div class="relative">
               <input class="form-input pr-12 <?= isset($errors_fisik['berat_kg']) ? 'error' : '' ?>" 
-                     type="number" 
-                     step="0.1" 
+                     type="number" step="1" inputmode="numeric" pattern="\\d*"
                      id="berat_kg" 
                      name="berat_kg" 
                      min="30" 
                      max="150" 
                      required 
-                     placeholder="60.5"
+                     placeholder="60"
                      value="<?= htmlspecialchars($old_fisik['berat_kg'] ?? '') ?>"
-                     oninput="validateRealTime(this, 30, 150, 'Berat badan'); calcBMI();">
+                     oninput="validateIntegerRange(this, 30, 150, 'Berat badan'); calcBMI();">
               <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">kg</span>
             </div>
             <?= ferr($errors_fisik ?? [], 'berat_kg') ?>
@@ -174,15 +174,7 @@ function ferr($e,$f){
           </div>
         </div>
         
-        <div class="pt-4 border-t border-gray-200">
-          <button class="btn btn-primary btn-micro w-full" type="submit" onclick="haptic()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            Simpan Pemeriksaan Fisik
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
 
     <!-- Health Examination Form -->
@@ -194,7 +186,7 @@ function ferr($e,$f){
         Pemeriksaan Kesehatan
       </h2>
       
-      <form method="post" action="/lansia/<?= htmlspecialchars($l['id_unik']) ?>/pemeriksaan/kesehatan" class="space-y-6" onsubmit="return valKes(this)">
+      <div class="space-y-6">
         <!-- Lab Values Grid -->
         <div class="grid sm:grid-cols-2 gap-4">
           <div class="form-group">
@@ -282,17 +274,19 @@ function ferr($e,$f){
           </div>
         </div>
         
-        <div class="pt-4 border-t border-gray-200">
-          <button class="btn btn-success btn-micro w-full" type="submit" onclick="haptic()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
-              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-            </svg>
-            Simpan Pemeriksaan Kesehatan
-          </button>
-        </div>
-      </form>
+      </div>
+    </div>
+    <!-- Combined submit button (centered between cards on large screens) -->
+    <div class="pt-2 lg:col-span-2 flex justify-center">
+      <button id="combinedSubmit" class="btn btn-success btn-micro w-full sm:w-auto px-6" type="submit" onclick="haptic()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
+          <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+        </svg>
+        Simpan Pemeriksaan
+      </button>
     </div>
   </div>
+  </form>
 </div>
 
 
@@ -323,6 +317,35 @@ function validateRealTime(input, min, max, label) {
     input.parentNode.appendChild(errorEl);
   }
   
+  return isValid;
+}
+
+// Validate integer-only inputs within range
+function validateIntegerRange(input, min, max, label) {
+  const raw = input.value.trim();
+  const intPattern = /^\d+$/;
+  const isInt = intPattern.test(raw);
+  const value = isInt ? parseInt(raw, 10) : NaN;
+  const isValid = isInt && value >= min && value <= max;
+
+  // Remove existing error styling and messages
+  input.classList.remove('error');
+  const existingError = input.parentNode.querySelector('.form-error');
+  if (existingError) existingError.remove();
+
+  if (raw && !isValid) {
+    input.classList.add('error');
+    const errorEl = document.createElement('div');
+    errorEl.className = 'form-error animate-fade-in';
+    errorEl.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 flex-shrink-0 mt-0.5">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+      </svg>
+      <span>${label} harus bilangan bulat antara ${min} - ${max}</span>
+    `;
+    input.parentNode.appendChild(errorEl);
+  }
+
   return isValid;
 }
 
@@ -366,7 +389,7 @@ function valFisik(f){
   
   for(const [id, min, max, label] of toCheck){
     const el = f[id]; 
-    const isValid = validateRealTime(el, min, max, label);
+    const isValid = id === 'berat_kg' ? validateIntegerRange(el, min, max, label) : validateRealTime(el, min, max, label);
     
     if (!isValid) {
       isFormValid = false;
@@ -438,6 +461,51 @@ function valKes(f){
     
     // Add subtle haptic feedback for successful submission
     haptic(5);
+  }
+  return true;
+}
+
+// Validate both sections together before submitting combined form
+function valAll(form){
+  // Validate Fisik
+  const fisikChecks = [
+    ['tinggi_cm', 100, 200, 'Tinggi badan'],
+    ['berat_kg', 30, 150, 'Berat badan'],
+    ['sistolik', 70, 250, 'Tekanan sistolik'],
+    ['diastolik', 40, 150, 'Tekanan diastolik']
+  ];
+  let ok = true; let first = null;
+  for (const [id,min,max,label] of fisikChecks){
+    const el = form[id];
+    const valid = id === 'berat_kg' ? validateIntegerRange(el, min, max, label) : validateRealTime(el, min, max, label);
+    if (!valid){ ok=false; if(!first) first=el; window.loadingManager.setInputError(el); }
+  }
+
+  // Validate Kesehatan
+  const gulaTipeSel = form['gula_tipe'];
+  if (!validateSelectRealTime(gulaTipeSel)) { ok=false; if(!first) first=gulaTipeSel; window.loadingManager.setInputError(gulaTipeSel); }
+  const kesChecks = [
+    ['asam_urat_mgdl', 2.0, 15.0, 'Asam urat'],
+    ['gula_mgdl', 50, 500, 'Gula darah'],
+    ['kolesterol_total_mgdl', 100, 400, 'Kolesterol total']
+  ];
+  for (const [id,min,max,label] of kesChecks){
+    const el = form[id];
+    const valid = validateRealTime(el, min, max, label);
+    if (!valid){ ok=false; if(!first) first=el; window.loadingManager.setInputError(el); }
+  }
+
+  if (!ok){
+    first?.focus();
+    haptic(20);
+    return false;
+  }
+
+  // Loading state
+  const btn = document.getElementById('combinedSubmit');
+  if (btn){
+    window.loadingManager.setButtonLoading(btn, 'Menyimpan Pemeriksaan...');
+    window.loadingManager.showFormLoading(form, 'Memproses data pemeriksaan...');
   }
   return true;
 }

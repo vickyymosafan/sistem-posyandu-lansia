@@ -95,9 +95,12 @@ class LansiaController extends Controller
     {
         $l = Lansia::findByKode($kode);
         if (!$l) { http_response_code(404); echo 'Data lansia tidak ditemukan'; return; }
+        // Ambil 10 riwayat pemeriksaan terbaru
+        $riwayat = \App\Models\Pemeriksaan::listByLansia((int)$l['id'], 10);
         $this->view('lansia/show', [
             'title' => 'Profil Lansia',
             'l' => $l,
+            'riwayat' => $riwayat,
         ]);
     }
 
