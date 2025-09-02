@@ -1,1 +1,5 @@
-.kiro/
+## Ignore database dump
+database/posyandu.sql
+
+## Ignore local environment variables
+.env

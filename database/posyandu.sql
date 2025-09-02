@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 31, 2025 at 10:35 AM
--- Server version: 9.4.0
--- PHP Version: 8.2.18
+-- Waktu pembuatan: 02 Sep 2025 pada 10.17
+-- Versi server: 9.4.0
+-- Versi PHP: 8.3.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lansia`
+-- Struktur dari tabel `lansia`
 --
 
 CREATE TABLE `lansia` (
@@ -44,7 +44,7 @@ CREATE TABLE `lansia` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pemeriksaan`
+-- Struktur dari tabel `pemeriksaan`
 --
 
 CREATE TABLE `pemeriksaan` (
@@ -74,7 +74,7 @@ CREATE TABLE `pemeriksaan` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Struktur dari tabel `users`
 --
 
 CREATE TABLE `users` (
@@ -88,19 +88,26 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
+-- Dumping data untuk tabel `users`
+--
+
+INSERT INTO `users` (`id`, `nama`, `role`, `password_hash`, `aktif`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin', '$2y$10$Rk8ff9rW4Qj8kxYVCsoNNefhDGbZcR3DYA2eyFs/v2oZf48RwlkBS', 1, '2025-09-02 08:39:12', '2025-09-02 08:39:12'),
+(2, 'vickymosafan', 'petugas', '$2y$10$3fXy3pM0vPjHgVI1bLhWMOkncWDvf6HJVEsXJjv55zYjp0wslzcNS', 1, '2025-09-02 15:44:22', '2025-09-02 16:59:56');
+
+--
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `lansia`
+-- Indeks untuk tabel `lansia`
 --
 ALTER TABLE `lansia`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id_unik` (`id_unik`),
-  ADD UNIQUE KEY `uniq_lansia_nik` (`nik`);
+  ADD UNIQUE KEY `id_unik` (`id_unik`);
 
 --
--- Indexes for table `pemeriksaan`
+-- Indeks untuk tabel `pemeriksaan`
 --
 ALTER TABLE `pemeriksaan`
   ADD PRIMARY KEY (`id`),
@@ -108,39 +115,39 @@ ALTER TABLE `pemeriksaan`
   ADD KEY `idx_pem_lansia_tgl` (`lansia_id`,`tgl_periksa`);
 
 --
--- Indexes for table `users`
+-- Indeks untuk tabel `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT for table `lansia`
+-- AUTO_INCREMENT untuk tabel `lansia`
 --
 ALTER TABLE `lansia`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `pemeriksaan`
+-- AUTO_INCREMENT untuk tabel `pemeriksaan`
 --
 ALTER TABLE `pemeriksaan`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- Constraints for dumped tables
+-- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
 --
 
 --
--- Constraints for table `pemeriksaan`
+-- Ketidakleluasaan untuk tabel `pemeriksaan`
 --
 ALTER TABLE `pemeriksaan`
   ADD CONSTRAINT `fk_pem_lansia` FOREIGN KEY (`lansia_id`) REFERENCES `lansia` (`id`) ON DELETE CASCADE,
