@@ -49,6 +49,46 @@ function err($f,$e){
       <?php endif; ?>
     </div>
     
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="form-group">
+        <label class="form-label required" for="nik">NIK</label>
+        <input class="form-input <?= isset($errors['nik']) ? 'error' : '' ?>"
+               type="text"
+               id="nik"
+               name="nik"
+               required
+               inputmode="numeric"
+               pattern="\d{16}"
+               maxlength="16"
+               placeholder="16 digit NIK"
+               value="<?= htmlspecialchars($old['nik'] ?? '') ?>">
+        <?php if (isset($errors['nik'])): ?>
+          <div class="form-error" role="alert"><span><?= htmlspecialchars($errors['nik']) ?></span></div>
+        <?php else: ?>
+          <p class="form-help">Masukkan 16 digit NIK sesuai KTP. <span id="nikCounter" aria-live="polite" class="ml-1 font-medium text-gray-600">0/16</span></p>
+        <?php endif; ?>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required" for="kk">No. KK</label>
+        <input class="form-input <?= isset($errors['kk']) ? 'error' : '' ?>"
+               type="text"
+               id="kk"
+               name="kk"
+               required
+               inputmode="numeric"
+               pattern="\d{16}"
+               maxlength="16"
+               placeholder="16 digit Nomor KK"
+               value="<?= htmlspecialchars($old['kk'] ?? '') ?>">
+        <?php if (isset($errors['kk'])): ?>
+          <div class="form-error" role="alert"><span><?= htmlspecialchars($errors['kk']) ?></span></div>
+        <?php else: ?>
+          <p class="form-help">Masukkan 16 digit nomor Kartu Keluarga. <span id="kkCounter" aria-live="polite" class="ml-1 font-medium text-gray-600">0/16</span></p>
+        <?php endif; ?>
+      </div>
+    </div>
+    
     <div class="form-group">
       <label class="form-label required" for="tgl_lahir">Tanggal Lahir</label>
       <input class="form-input <?= isset($errors['tgl_lahir']) ? 'error' : '' ?>" 
@@ -222,6 +262,20 @@ function hitungUsiaLive(){
 }
 document.addEventListener('DOMContentLoaded', function() {
   hitungUsiaLive();
+  // Update NIK/KK counters
+  const nik = document.getElementById('nik');
+  const kk = document.getElementById('kk');
+  const nikCounter = document.getElementById('nikCounter');
+  const kkCounter = document.getElementById('kkCounter');
+  function countDigits(val){ return (val || '').replace(/\D+/g,'').length; }
+  function setCounter(el, counter){
+    if (!el || !counter) return;
+    const len = countDigits(el.value);
+    counter.textContent = len + '/16';
+    counter.style.color = (len === 16) ? '#059669' : '#6B7280'; // green if complete
+  }
+  if (nik) { setCounter(nik, nikCounter); nik.addEventListener('input', ()=> setCounter(nik, nikCounter)); }
+  if (kk) { setCounter(kk, kkCounter); kk.addEventListener('input', ()=> setCounter(kk, kkCounter)); }
   
   // Enhanced keyboard navigation for form
   const formElements = document.querySelectorAll('input, textarea, button, select');

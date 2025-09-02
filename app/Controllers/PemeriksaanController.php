@@ -90,6 +90,7 @@ class PemeriksaanController extends Controller
         // Catat sebagai entry baru setiap kali disimpan (meskipun di hari yang sama)
         Pemeriksaan::create([
             'lansia_id' => (int)$l['id'],
+            'petugas_id' => (int)($_SESSION['user']['id'] ?? 0) ?: null,
             'tinggi_cm' => $tinggi,
             'berat_kg' => $berat,
             'sistolik' => $sys,
@@ -300,6 +301,7 @@ class PemeriksaanController extends Controller
         // Insert a single new row
         Pemeriksaan::create([
             'lansia_id' => (int)$l['id'],
+            'petugas_id' => (int)($_SESSION['user']['id'] ?? 0) ?: null,
             'tinggi_cm' => (int)$fisik['tinggi_cm'],
             'berat_kg' => (int)$fisik['berat_kg'],
             'sistolik' => $sys,

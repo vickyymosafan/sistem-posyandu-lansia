@@ -13,13 +13,22 @@ class Lansia
         $stmt->execute([':n' => trim($nama)]);
         return (bool)$stmt->fetchColumn();
     }
+    public static function existsByNik(string $nik): bool
+    {
+        $pdo = Database::pdo();
+        $stmt = $pdo->prepare('SELECT 1 FROM lansia WHERE nik = :nik LIMIT 1');
+        $stmt->execute([':nik' => trim($nik)]);
+        return (bool)$stmt->fetchColumn();
+    }
     public static function create(array $data): int
     {
         $pdo = Database::pdo();
-        $stmt = $pdo->prepare("INSERT INTO lansia (id_unik, nama_lengkap, tgl_lahir, jk, alamat, no_telp, created_at, updated_at) VALUES (:id_unik, :nama_lengkap, :tgl_lahir, :jk, :alamat, :no_telp, NOW(), NOW())");
+        $stmt = $pdo->prepare("INSERT INTO lansia (id_unik, nama_lengkap, nik, kk, tgl_lahir, jk, alamat, no_telp, created_at, updated_at) VALUES (:id_unik, :nama_lengkap, :nik, :kk, :tgl_lahir, :jk, :alamat, :no_telp, NOW(), NOW())");
         $stmt->execute([
             ':id_unik' => $data['id_unik'],
             ':nama_lengkap' => $data['nama_lengkap'],
+            ':nik' => $data['nik'] ?? null,
+            ':kk' => $data['kk'] ?? null,
             ':tgl_lahir' => $data['tgl_lahir'],
             ':jk' => $data['jk'],
             ':alamat' => $data['alamat'],
@@ -59,7 +68,7 @@ class Lansia
         $stmt->execute($params);
         $total = (int)($stmt->fetch(PDO::FETCH_ASSOC)['c'] ?? 0);
 
-        $sql = "SELECT id_unik, nama_lengkap, tgl_lahir, jk, no_telp, created_at FROM lansia $where ORDER BY created_at DESC LIMIT :lim OFFSET :off";
+        $sql = "SELECT id_unik, nama_lengkap, nik, kk, tgl_lahir, jk, no_telp, created_at FROM lansia $where ORDER BY created_at DESC LIMIT :lim OFFSET :off";
         $stmt = $pdo->prepare($sql);
         foreach ($params as $k => $v) { $stmt->bindValue($k, $v, PDO::PARAM_STR); }
         $stmt->bindValue(':lim', $perPage, PDO::PARAM_INT);

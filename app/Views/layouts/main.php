@@ -532,8 +532,13 @@
       box-shadow: var(--shadow-sm);
     }
     
+    .btn:hover {
+      text-decoration: none;
+    }
+
     .btn-primary:hover:not(:disabled) {
       background-color: var(--color-primary-hover);
+      color: #ffffff; /* keep text visible on hover */
       box-shadow: var(--shadow-md);
     }
     
@@ -1765,9 +1770,14 @@
         $base = 'inline-flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-all duration-150';
         return $active ? ($base . ' bg-blue-600 text-white shadow-sm') : ($base . ' text-gray-600 hover:text-blue-600 hover:bg-blue-50');
     };
+    $auth = $_SESSION['user'] ?? null;
+    $isAdmin = $auth && (($auth['role'] ?? null) === 'admin');
+    $isLoggedIn = (bool)$auth;
+    $csrfToken = $_SESSION['csrf_token'] ?? '';
+    $isAuthPage = isset($isAuthPage) && (bool)$isAuthPage;
   ?>
   
-  
+  <?php if (!$isAuthPage): ?>
   <header class="bg-white border-b border-gray-200 sticky top-0 z-20 transition-shadow duration-200" id="siteHeader" role="banner">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <a href="/" class="flex items-center gap-3 font-semibold text-lg tracking-tight hover:opacity-80 transition-opacity duration-150 focus:opacity-80" aria-label="Posyandu Lansia - Beranda">
@@ -1777,10 +1787,26 @@
 
       <!-- Desktop nav -->
       <nav class="hidden md:flex items-center gap-2" role="navigation" aria-label="Navigasi utama">
-        <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?>" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Daftar Lansia</a>
-        <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?>" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
-        <a href="/find" class="<?= $linkCls($isActive('/find')) ?>" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
+        <?php if ($isLoggedIn): ?>
+          <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?>" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Daftar Lansia</a>
+          <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?>" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
+          <a href="/find" class="<?= $linkCls($isActive('/find')) ?>" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
+          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?>" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
+          <?php if ($isAdmin): ?>
+            <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?>" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
+          <?php endif; ?>
+        <?php endif; ?>
       </nav>
+
+      <div class="hidden md:flex items-center gap-3">
+        <?php if ($isLoggedIn): ?>
+          <span class="text-sm text-gray-700">Halo, <strong><?= htmlspecialchars($auth['nama'] ?? 'Pengguna') ?></strong> <span class="text-xs text-gray-500">(<?= htmlspecialchars($auth['role'] ?? '-') ?>)</span></span>
+          <form method="post" action="/logout">
+            <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
+            <button type="submit" class="btn btn-secondary">Keluar</button>
+          </form>
+        <?php endif; ?>
+      </div>
 
       <!-- Mobile toggle -->
       <button id="navToggle" 
@@ -1805,20 +1831,33 @@
     <!-- Mobile nav -->
     <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 bg-white overflow-hidden transition-all duration-200 ease-in-out focus-trap" style="max-height: 0;" role="region" aria-labelledby="navToggle">
       <nav class="px-4 py-4 space-y-2" role="navigation" aria-label="Navigasi mobile">
-        <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Daftar Lansia</a>
-        <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
-        <a href="/find" class="<?= $linkCls($isActive('/find')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
+        <?php if ($isLoggedIn): ?>
+          <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Daftar Lansia</a>
+          <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
+          <a href="/find" class="<?= $linkCls($isActive('/find')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
+          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
+          <?php if ($isAdmin): ?>
+            <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
+          <?php endif; ?>
+          <form method="post" action="/logout" class="pt-2">
+            <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
+            <button type="submit" class="btn btn-secondary w-full">Keluar</button>
+          </form>
+        <?php endif; ?>
       </nav>
     </div>
   </header>
+  <?php endif; ?>
 
   <main id="main-content" class="max-w-6xl mx-auto px-4 py-8 flex-1" role="main" tabindex="-1">
     <?php include $view_template_path; ?>
   </main>
-
-  <footer class="text-center text-sm text-gray-500 py-8 mt-auto border-t border-gray-200 bg-gray-50" role="contentinfo">
-    <p>&copy; <?= date('Y') ?> Posyandu Lansia. Semua hak dilindungi.</p>
-  </footer>
+  
+  <?php if (!$isAuthPage): ?>
+    <footer class="text-center text-sm text-gray-500 py-8 mt-auto border-t border-gray-200 bg-gray-50" role="contentinfo">
+      <p>&copy; <?= date('Y') ?> Posyandu Lansia. Semua hak dilindungi.</p>
+    </footer>
+  <?php endif; ?>
 
   <script>
     // Mobile nav toggle with smooth animation and keyboard navigation

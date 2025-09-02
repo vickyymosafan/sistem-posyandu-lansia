@@ -20,5 +20,14 @@ class Controller
         header('Content-Type: application/json');
         echo json_encode($data);
     }
+
+    protected function requireAdmin(): void
+    {
+        $role = $_SESSION['user']['role'] ?? null;
+        if ($role !== 'admin') {
+            $curr = rtrim(strtok($_SERVER['REQUEST_URI'] ?? '/', '?'), '/') ?: '/';
+            $this->redirect('/login?next=' . rawurlencode($curr));
+        }
+    }
 }
 

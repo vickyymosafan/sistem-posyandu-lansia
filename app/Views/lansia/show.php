@@ -72,9 +72,35 @@ try {
               </div>
               <div>
                 <div class="text-sm font-medium text-gray-600 mb-1.5 leading-relaxed">No. Telepon</div>
-                <div class="text-base font-semibold text-gray-900 leading-relaxed"><?= htmlspecialchars($l['no_telp']) ?></div>
+              <div class="text-base font-semibold text-gray-900 leading-relaxed"><?= htmlspecialchars($l['no_telp']) ?></div>
+            </div>
+          </div>
+
+          <!-- Identity Information -->
+          <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75a2.25 2.25 0 012.25 2.25v12a2.25 2.25 0 01-2.25 2.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75h9zM8.25 8.25h7.5M8.25 12h7.5M8.25 15.75h4.5" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 leading-tight">Identitas Kependudukan</h3>
+            </div>
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <div class="text-sm font-medium text-gray-600 mb-1.5 leading-relaxed">NIK</div>
+                <div class="text-base font-semibold text-gray-900 leading-relaxed font-mono tracking-wider">
+                  <?= htmlspecialchars($l['nik'] ?? '-') ?>
+                </div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600 mb-1.5 leading-relaxed">No. KK</div>
+                <div class="text-base font-semibold text-gray-900 leading-relaxed font-mono tracking-wider">
+                  <?= htmlspecialchars($l['kk'] ?? '-') ?>
+                </div>
               </div>
             </div>
+          </div>
           </div>
           
           <!-- Address Information -->
@@ -118,6 +144,9 @@ try {
                       <time datetime="<?= htmlspecialchars($row['tgl_periksa']) ?>">
                         <?= htmlspecialchars((new DateTime($row['tgl_periksa']))->format('d M Y H:i')) ?>
                       </time>
+                      <?php if (!empty($row['petugas_nama'])): ?>
+                        <div class="mt-1 text-xs text-gray-500">Dicatat oleh: <?= htmlspecialchars($row['petugas_nama']) ?></div>
+                      <?php endif; ?>
                     </td>
                     <td class="text-sm text-gray-800">
                       <?php if ($row['sistolik'] && $row['diastolik']): ?>
@@ -204,6 +233,9 @@ try {
                     </div>
                   <?php endif; ?>
                 </div>
+                <?php if (!empty($row['petugas_nama'])): ?>
+                  <div class="mt-1 text-[11px] text-gray-500">Dicatat oleh: <?= htmlspecialchars($row['petugas_nama']) ?></div>
+                <?php endif; ?>
                 <div class="mt-2 text-xs text-gray-700 grid grid-cols-2 gap-2">
                   <div>
                     BMI: <?= $row['bmi'] ? htmlspecialchars($row['bmi']) : '-' ?>

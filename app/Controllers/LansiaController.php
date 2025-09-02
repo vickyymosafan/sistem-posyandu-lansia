@@ -39,6 +39,8 @@ class LansiaController extends Controller
     {
         $input = [
             'nama_lengkap' => trim($_POST['nama_lengkap'] ?? ''),
+            'nik' => trim($_POST['nik'] ?? ''),
+            'kk' => trim($_POST['kk'] ?? ''),
             'tgl_lahir' => trim($_POST['tgl_lahir'] ?? ''),
             'jk' => trim($_POST['jk'] ?? ''),
             'alamat' => trim($_POST['alamat'] ?? ''),
@@ -48,6 +50,9 @@ class LansiaController extends Controller
         $v = new Validator($input);
         $v->required('nama_lengkap', 'Nama lengkap')->maxLen('nama_lengkap', 150, 'Nama lengkap');
         $v->required('tgl_lahir', 'Tanggal lahir')->date('tgl_lahir', 'Tanggal lahir');
+        // NIK & KK 16 digit
+        $v->required('nik', 'NIK')->regex('nik', '/^\d{16}$/', 'NIK harus 16 digit angka');
+        $v->required('kk', 'KK')->regex('kk', '/^\d{16}$/', 'KK harus 16 digit angka');
         $v->required('jk', 'Jenis kelamin')->enum('jk', ['L','P'], 'Jenis kelamin');
         $v->required('alamat', 'Alamat')->maxLen('alamat', 255, 'Alamat');
         $v->required('no_telp', 'Nomor telepon')->regex('no_telp', '/^(?:\+62|62|0)8[1-9][0-9]{7,10}$/', 'Nomor telepon tidak valid');
@@ -59,10 +64,18 @@ class LansiaController extends Controller
             return;
         }
 
-        // Cek duplikasi nama lengkap (case-insensitive)
+        // Cek duplikasi
         if (\App\Models\Lansia::existsByNama($input['nama_lengkap'])) {
             $_SESSION['errors'] = array_merge($v->errors(), [
                 'nama_lengkap' => 'Nama lengkap sudah terdaftar. Gunakan nama yang berbeda.'
+            ]);
+            $_SESSION['old'] = $input;
+            $this->redirect('/lansia/create');
+            return;
+        }
+        if (\App\Models\Lansia::existsByNik($input['nik'])) {
+            $_SESSION['errors'] = array_merge($v->errors(), [
+                'nik' => 'NIK sudah terdaftar.'
             ]);
             $_SESSION['old'] = $input;
             $this->redirect('/lansia/create');

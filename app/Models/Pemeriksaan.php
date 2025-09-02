@@ -181,24 +181,26 @@ class Pemeriksaan
         // Build SELECT fields defensively based on available columns
         $avail = self::columns();
         $has = static function(string $c) use ($avail): bool { return in_array($c, $avail, true); };
-        $field = static function(string $c, ?string $alias = null) use ($has): string {
-            return $has($c) ? $c : ('NULL AS ' . ($alias ?? $c));
+        // Prefix pemeriksaan table alias `p` for existing columns; fallback to NULL as alias
+        $pf = static function(string $c, ?string $alias = null) use ($has): string {
+            return $has($c) ? ('p.`' . $c . '`') : ('NULL AS ' . ($alias ?? $c));
         };
 
         $fields = [
-            'id', 'lansia_id', 'tgl_periksa',
-            $field('tinggi_cm'),
-            $field('berat_kg'),
-            $field('sistolik'),
-            $field('diastolik'),
-            $field('tekanan_darah_kategori'),
-            $field('bmi'),
-            $field('bmi_kategori'),
-            $field('asam_urat_mgdl'),
-            $field('asam_urat_kategori'),
-            $field('gula_mgdl'),
-            $field('gula_tipe'),
-            $field('gula_kategori'),
+            'p.`id`', 'p.`lansia_id`', 'p.`tgl_periksa`',
+            $pf('tinggi_cm'),
+            $pf('berat_kg'),
+            $pf('sistolik'),
+            $pf('diastolik'),
+            $pf('tekanan_darah_kategori'),
+            $pf('bmi'),
+            $pf('bmi_kategori'),
+            $pf('asam_urat_mgdl'),
+            $pf('asam_urat_kategori'),
+            $pf('gula_mgdl'),
+            $pf('gula_tipe'),
+            $pf('gula_kategori'),
+            $pf('petugas_id'),
         ];
 
         // Cholesterol (support legacy kolesterol_mgdl)
@@ -206,20 +208,23 @@ class Pemeriksaan
         $hasTotal = $has('kolesterol_total_mgdl');
         $hasLegacy = $has('kolesterol_mgdl');
         if ($hasTotal && $hasLegacy) {
-            $cholExpr = 'COALESCE(kolesterol_total_mgdl, kolesterol_mgdl) AS kolesterol_total_mgdl';
+            $cholExpr = 'COALESCE(p.`kolesterol_total_mgdl`, p.`kolesterol_mgdl`) AS kolesterol_total_mgdl';
         } elseif ($hasTotal) {
-            $cholExpr = 'kolesterol_total_mgdl';
+            $cholExpr = 'p.`kolesterol_total_mgdl`';
         } elseif ($hasLegacy) {
-            $cholExpr = 'kolesterol_mgdl AS kolesterol_total_mgdl';
+            $cholExpr = 'p.`kolesterol_mgdl` AS kolesterol_total_mgdl';
         } else {
             $cholExpr = 'NULL AS kolesterol_total_mgdl';
         }
         $fields[] = $cholExpr;
-        $fields[] = $field('kolesterol_total_kategori');
-        $fields[] = $field('catatan');
+        $fields[] = $pf('kolesterol_total_kategori');
+        $fields[] = $pf('catatan');
+        // Petugas name (nullable)
+        $fields[] = 'u.`nama` AS petugas_nama';
 
-        $sql = 'SELECT ' . implode(', ', $fields) . ' FROM pemeriksaan '
-             . 'WHERE lansia_id = :lid ORDER BY tgl_periksa DESC, id DESC LIMIT :lim';
+        $sql = 'SELECT ' . implode(', ', $fields) . ' FROM pemeriksaan p '
+             . 'LEFT JOIN users u ON u.id = p.petugas_id '
+             . 'WHERE p.lansia_id = :lid ORDER BY p.tgl_periksa DESC, p.id DESC LIMIT :lim';
         $st = $pdo->prepare($sql);
         $st->bindValue(':lid', $lansiaId, PDO::PARAM_INT);
         $st->bindValue(':lim', max(1, $limit), PDO::PARAM_INT);
