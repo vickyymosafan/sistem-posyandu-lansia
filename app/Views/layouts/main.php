@@ -1788,7 +1788,7 @@
       <!-- Desktop nav -->
       <nav class="hidden md:flex items-center gap-2" role="navigation" aria-label="Navigasi utama">
         <?php if ($isLoggedIn): ?>
-          <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?>" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Daftar Lansia</a>
+          <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?>" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Data Lansia</a>
           <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?>" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
           <a href="/find" class="<?= $linkCls($isActive('/find')) ?>" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
           <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?>" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
@@ -1832,7 +1832,7 @@
     <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 bg-white overflow-hidden transition-all duration-200 ease-in-out focus-trap" style="max-height: 0;" role="region" aria-labelledby="navToggle">
       <nav class="px-4 py-4 space-y-2" role="navigation" aria-label="Navigasi mobile">
         <?php if ($isLoggedIn): ?>
-          <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Daftar Lansia</a>
+          <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Data Lansia</a>
           <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
           <a href="/find" class="<?= $linkCls($isActive('/find')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
           <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
