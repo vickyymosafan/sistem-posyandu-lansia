@@ -1800,7 +1800,13 @@
       <div class="hidden md:flex items-center gap-3">
         <?php if ($isLoggedIn): ?>
           <span class="text-sm text-gray-700">Halo, <strong><?= htmlspecialchars($auth['nama'] ?? 'Pengguna') ?></strong> <span class="text-xs text-gray-500">(<?= htmlspecialchars($auth['role'] ?? '-') ?>)</span></span>
-          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?>" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
+          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> gap-2" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 20.25a8.25 8.25 0 0115 0" />
+            </svg>
+            <span>Profil</span>
+          </a>
           <form method="post" action="/logout">
             <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
             <button type="submit" class="btn btn-secondary">Keluar</button>
@@ -1839,7 +1845,13 @@
             <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
           <?php endif; ?>
           <div class="pt-2 flex gap-2">
-            <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> flex-1 justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
+            <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> flex-1 justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 20.25a8.25 8.25 0 0115 0" />
+              </svg>
+              <span>Profil</span>
+            </a>
             <form method="post" action="/logout" class="flex-1">
               <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
               <button type="submit" class="btn btn-secondary w-full">Keluar</button>
