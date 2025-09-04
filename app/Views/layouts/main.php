@@ -1791,7 +1791,6 @@
           <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?>" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Data Lansia</a>
           <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?>" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
           <a href="/find" class="<?= $linkCls($isActive('/find')) ?>" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
-          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?>" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
           <?php if ($isAdmin): ?>
             <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?>" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
           <?php endif; ?>
@@ -1801,6 +1800,7 @@
       <div class="hidden md:flex items-center gap-3">
         <?php if ($isLoggedIn): ?>
           <span class="text-sm text-gray-700">Halo, <strong><?= htmlspecialchars($auth['nama'] ?? 'Pengguna') ?></strong> <span class="text-xs text-gray-500">(<?= htmlspecialchars($auth['role'] ?? '-') ?>)</span></span>
+          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?>" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
           <form method="post" action="/logout">
             <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
             <button type="submit" class="btn btn-secondary">Keluar</button>
@@ -1835,14 +1835,16 @@
           <a href="/lansia" class="<?= $linkCls($isActive('/lansia')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia') ? 'page' : 'false' ?>">Data Lansia</a>
           <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
           <a href="/find" class="<?= $linkCls($isActive('/find')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
-          <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
           <?php if ($isAdmin): ?>
             <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
           <?php endif; ?>
-          <form method="post" action="/logout" class="pt-2">
-            <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
-            <button type="submit" class="btn btn-secondary w-full">Keluar</button>
-          </form>
+          <div class="pt-2 flex gap-2">
+            <a href="/profil" class="<?= $linkCls($isActive('/profil')) ?> flex-1 justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/profil') ? 'page' : 'false' ?>">Profil</a>
+            <form method="post" action="/logout" class="flex-1">
+              <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrfToken) ?>">
+              <button type="submit" class="btn btn-secondary w-full">Keluar</button>
+            </form>
+          </div>
         <?php endif; ?>
       </nav>
     </div>
