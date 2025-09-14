@@ -163,10 +163,25 @@ function badgeJK($jk){ return $jk==='L' ? 'Laki-laki' : 'Perempuan'; }
                 </span>
               </td>
               <td class="px-6 py-4" role="cell">
-                <code class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm font-mono"
-                      aria-label="ID Unik: <?= htmlspecialchars($row['id_unik']) ?>">
-                  <?= htmlspecialchars($row['id_unik']) ?>
-                </code>
+                <div class="flex items-center gap-2">
+                  <code class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm font-mono select-all"
+                        aria-label="ID Unik: <?= htmlspecialchars($row['id_unik']) ?>">
+                    <?= htmlspecialchars($row['id_unik']) ?>
+                  </code>
+                  <div class="relative inline-block">
+                    <button type="button"
+                            class="copy-id-btn inline-flex items-center justify-center p-1.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            data-idunik="<?= htmlspecialchars($row['id_unik']) ?>"
+                            aria-label="Salin ID Unik <?= htmlspecialchars($row['id_unik']) ?>"
+                            title="Salin">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16.5V6.75A2.25 2.25 0 0110.25 4.5h6a2.25 2.25 0 012.25 2.25v9.75A2.25 2.25 0 0116.25 18.75h-6A2.25 2.25 0 018 16.5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7.5H6.75A2.25 2.25 0 004.5 9.75v9.75A2.25 2.25 0 006.75 21.75h9.75A2.25 2.25 0 0018.75 19.5V18"/>
+                      </svg>
+                    </button>
+                    <span class="copy-tip hidden absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-900 text-white text-[10px] px-2 py-1 rounded shadow">Tersalin!</span>
+                  </div>
+                </div>
               </td>
               <td class="px-6 py-4" role="cell">
                 <div class="flex items-center gap-2" role="group" aria-label="Aksi untuk <?= htmlspecialchars($row['nama_lengkap']) ?>">
@@ -254,9 +269,24 @@ function badgeJK($jk){ return $jk==='L' ? 'Laki-laki' : 'Perempuan'; }
                   </a>
                 </h3>
                 <p class="text-sm text-gray-500 mt-1">
-                  <code class="px-1.5 py-0.5 bg-gray-100 text-gray-800 rounded text-xs font-mono">
-                    <?= htmlspecialchars($row['id_unik']) ?>
-                  </code>
+                  <span class="inline-flex items-center gap-2">
+                    <code class="px-1.5 py-0.5 bg-gray-100 text-gray-800 rounded text-xs font-mono select-all">
+                      <?= htmlspecialchars($row['id_unik']) ?>
+                    </code>
+                    <span class="relative inline-block">
+                      <button type="button"
+                              class="copy-id-btn inline-flex items-center justify-center p-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              data-idunik="<?= htmlspecialchars($row['id_unik']) ?>"
+                              aria-label="Salin ID Unik <?= htmlspecialchars($row['id_unik']) ?>"
+                              title="Salin">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16.5V6.75A2.25 2.25 0 0110.25 4.5h6a2.25 2.25 0 012.25 2.25v9.75A2.25 2.25 0 0116.25 18.75h-6A2.25 2.25 0 018 16.5z"/>
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7.5H6.75A2.25 2.25 0 004.5 9.75v9.75A2.25 2.25 0 006.75 21.75h9.75A2.25 2.25 0 0018.75 19.5V18"/>
+                        </svg>
+                      </button>
+                      <span class="copy-tip hidden absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-900 text-white text-[10px] px-2 py-1 rounded shadow">Tersalin!</span>
+                    </span>
+                  </span>
                 </p>
               </div>
               <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 <?= $row['jk'] === 'L' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' ?>">
@@ -397,7 +427,7 @@ function clearSearch() {
 }
 
 // Enhanced search functionality with accessibility
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('searchInput');
   
   if (searchInput) {
@@ -499,6 +529,52 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
       });
+    });
+
+    // Copy ID Unik handler (desktop + mobile)
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.copy-id-btn');
+      if (!btn) return;
+      e.preventDefault();
+      const id = btn.getAttribute('data-idunik');
+      if (!id) return;
+
+      const onSuccess = () => {
+        try { if (typeof haptic === 'function') haptic(10); } catch (_) {}
+        if (window.loadingManager && window.loadingManager.setButtonSuccess) {
+          window.loadingManager.setButtonSuccess(btn, 'Tersalin!', 1200);
+        } else {
+          const original = btn.innerHTML;
+          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4 text-green-700"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l4 4L17 6" /></svg>';
+          setTimeout(()=>{ btn.innerHTML = original; }, 1200);
+        }
+        // Show tooltip bubble for a moment
+        const tip = btn.parentElement.querySelector('.copy-tip');
+        if (tip) {
+          tip.classList.remove('hidden');
+          setTimeout(()=> tip.classList.add('hidden'), 1200);
+        }
+        // Update title temporarily
+        const originalTitle = btn.getAttribute('title');
+        btn.setAttribute('title', 'Tersalin!');
+        setTimeout(()=> btn.setAttribute('title', originalTitle || 'Salin'), 1500);
+        announceToScreenReader('ID Unik tersalin ke papan klip');
+      };
+
+      const fallbackCopy = () => {
+        const ta = document.createElement('textarea');
+        ta.value = id; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); onSuccess(); } catch(_) {}
+        document.body.removeChild(ta);
+      };
+
+      if (navigator.clipboard && window.isSecureContext !== false) {
+        navigator.clipboard.writeText(id).then(onSuccess).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
     });
   });
 });

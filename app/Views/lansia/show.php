@@ -10,7 +10,7 @@ try {
 }
 ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="grid gap-8 items-start lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+  <div class="grid gap-8 items-start lg:grid-cols-1">
     <div class="space-y-8">
       <!-- Profile Header Card -->
       <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -29,6 +29,20 @@ try {
               <?php if($usiaText): ?>
               <span class="text-gray-600 font-medium"><?= htmlspecialchars($usiaText) ?></span>
               <?php endif; ?>
+            </div>
+            <!-- ID Unik inline -->
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+              <span class="text-sm text-gray-600">ID Unik:</span>
+              <span id="unikCodeInline" class="font-mono text-base font-semibold tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200 select-all">
+                <?= htmlspecialchars($l['id_unik']) ?>
+              </span>
+              <button type="button" id="copyUnikBtnInline" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 16.5V6.75A2.25 2.25 0 0110.25 4.5h6a2.25 2.25 0 012.25 2.25v9.75A2.25 2.25 0 0116.25 18.75h-6A2.25 2.25 0 018 16.5z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7.5H6.75A2.25 2.25 0 004.5 9.75v9.75A2.25 2.25 0 006.75 21.75h9.75A2.25 2.25 0 0018.75 19.5V18"/>
+                </svg>
+                <span>Salin</span>
+              </button>
             </div>
           </div>
         </div>
@@ -72,7 +86,16 @@ try {
               </div>
               <div>
                 <div class="text-sm font-medium text-gray-600 mb-1.5 leading-relaxed">No. Telepon</div>
-              <div class="text-base font-semibold text-gray-900 leading-relaxed"><?= htmlspecialchars($l['no_telp']) ?></div>
+              <div class="text-base font-semibold text-gray-900 leading-relaxed">
+                <?php $tel = trim((string)($l['no_telp'] ?? '')); ?>
+                <?php if ($tel): ?>
+                  <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $tel)) ?>" class="text-blue-700 hover:text-blue-800 hover:underline">
+                    <?= htmlspecialchars($tel) ?>
+                  </a>
+                <?php else: ?>
+                  <span class="text-gray-500">-</span>
+                <?php endif; ?>
+              </div>
             </div>
           </div>
 
@@ -101,10 +124,8 @@ try {
               </div>
             </div>
           </div>
-          </div>
-          
           <!-- Address Information -->
-          <div class="mt-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+          <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
@@ -116,43 +137,58 @@ try {
             </div>
             <div class="text-base font-medium text-gray-900 leading-relaxed whitespace-pre-line"><?= htmlspecialchars($l['alamat']) ?></div>
           </div>
+          </div>
         </div>
       </div>
       
-      <!-- Riwayat Pemeriksaan -->
-      <div id="riwayat" class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Riwayat Pemeriksaan</h2>
-        <?php if (empty($riwayat ?? [])): ?>
-          <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">Belum ada riwayat pemeriksaan.</div>
-        <?php else: ?>
-          <div class="hidden md:block overflow-x-auto">
-            <table class="min-w-full table-modern">
+      <!-- Riwayat Pemeriksaan + Ringkasan Tren -->
+      <!-- Stack vertically to avoid clipping; remove 2-column grid layout -->
+      <div class="space-y-6">
+        <!-- Riwayat (kiri) -->
+        <div id="riwayat" class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Riwayat Pemeriksaan</h2>
+          <?php if (empty($riwayat ?? [])): ?>
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">Belum ada riwayat pemeriksaan.</div>
+          <?php else: ?>
+            <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full table-modern text-sm">
               <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>TD (mmHg)</th>
-                  <th>BMI</th>
-                  <th>Gula</th>
-                  <th>Kolesterol Total</th>
-                  <th>Asam Urat</th>
+                <tr class="text-left text-xs uppercase tracking-wide text-gray-500">
+                  <th class="py-3 pr-4">Tanggal</th>
+                  <th class="py-3 px-4 text-right">TD (mmHg)</th>
+                  <th class="py-3 px-4 text-right">BMI</th>
+                  <th class="py-3 px-4 text-right">Gula</th>
+                  <th class="py-3 px-4 text-right">Kolesterol Total</th>
+                  <th class="py-3 pl-4 text-right">Asam Urat</th>
                 </tr>
               </thead>
-              <tbody>
-                <?php foreach(($riwayat ?? []) as $row): ?>
-                  <tr>
-                    <td class="text-sm text-gray-700">
-                      <time datetime="<?= htmlspecialchars($row['tgl_periksa']) ?>">
-                        <?= htmlspecialchars((new DateTime($row['tgl_periksa']))->format('d M Y H:i')) ?>
-                      </time>
+              <tbody class="divide-y divide-gray-100">
+                <?php 
+                  $expGula = function($tipe){
+                    $t = strtolower(trim((string)$tipe));
+                    if ($t === 'puasa') return 'Pemeriksaan setelah puasa ≥ 8 jam';
+                    if ($t === 'sewaktu') return 'Pemeriksaan sewaktu/acak tanpa persiapan';
+                    if ($t === '2jpp' || $t === '2hpp' || $t === 'pp2' || $t === '2jampp') return 'Pemeriksaan 2 jam setelah makan (postprandial)';
+                    return null;
+                  };
+                ?>
+                <?php foreach(($riwayat ?? []) as $i => $row): ?>
+                  <tr class="align-top odd:bg-white even:bg-gray-50 hover:bg-gray-50">
+                    <td class="py-4 pr-4 text-gray-700">
+                      <div class="font-mono text-gray-900">
+                        <time datetime="<?= htmlspecialchars($row['tgl_periksa']) ?>">
+                          <?= htmlspecialchars((new DateTime($row['tgl_periksa']))->format('d M Y H:i')) ?>
+                        </time>
+                      </div>
                       <?php if (!empty($row['petugas_nama'])): ?>
                         <div class="mt-1 text-xs text-gray-500">Dicatat oleh: <?= htmlspecialchars($row['petugas_nama']) ?></div>
                       <?php endif; ?>
                     </td>
-                    <td class="text-sm text-gray-800">
+                    <td class="py-4 px-4 text-right text-gray-900 font-mono">
                       <?php if ($row['sistolik'] && $row['diastolik']): ?>
-                        <?= (int)$row['sistolik'] ?>/<?= (int)$row['diastolik'] ?>
+                        <?= (int)$row['sistolik'] ?>/<?= (int)$row['diastolik'] ?> <span class="text-gray-500">mmHg</span>
                         <?php if ($row['tekanan_darah_kategori']): ?>
-                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span class="block mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             <?= htmlspecialchars($row['tekanan_darah_kategori']) ?>
                           </span>
                         <?php endif; ?>
@@ -160,49 +196,55 @@ try {
                         -
                       <?php endif; ?>
                     </td>
-                    <td class="text-sm text-gray-800">
+                    <td class="py-4 px-4 text-right text-gray-900 font-mono">
                       <?php if ($row['bmi']): ?>
                         <?= htmlspecialchars($row['bmi']) ?>
                         <?php if ($row['bmi_kategori']): ?>
-                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          <span class="block mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                             <?= htmlspecialchars($row['bmi_kategori']) ?>
                           </span>
                         <?php endif; ?>
                       <?php else: ?>-
                       <?php endif; ?>
                     </td>
-                    <td class="text-sm text-gray-800">
+                    <td class="py-4 px-4 text-right text-gray-900 font-mono">
                       <?php if ($row['gula_mgdl']): ?>
-                        <?= (int)$row['gula_mgdl'] ?> mg/dL
-                        <?php if ($row['gula_tipe']): ?>
-                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                            <?= htmlspecialchars(strtoupper($row['gula_tipe'])) ?>
-                          </span>
-                        <?php endif; ?>
-                        <?php if ($row['gula_kategori']): ?>
-                          <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                            <?= htmlspecialchars($row['gula_kategori']) ?>
-                          </span>
-                        <?php endif; ?>
+                        <?= (int)$row['gula_mgdl'] ?> <span class="text-gray-500">mg/dL</span>
+                        <?php $gexp = $expGula($row['gula_tipe'] ?? null); ?>
+                        <div class="mt-1">
+                          <?php if ($row['gula_kategori']): ?>
+                            <div class="text-xs text-gray-600">Kategori: 
+                              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                <?= htmlspecialchars($row['gula_kategori']) ?>
+                              </span>
+                            </div>
+                          <?php endif; ?>
+                          <?php if ($row['gula_tipe']): ?>
+                            <div class="text-[11px] text-gray-500">Tipe: 
+                              <span class="font-medium text-amber-700"><?= htmlspecialchars(strtoupper($row['gula_tipe'])) ?></span>
+                              <?php if ($gexp): ?> — <?= htmlspecialchars($gexp) ?><?php endif; ?>
+                            </div>
+                          <?php endif; ?>
+                        </div>
                       <?php else: ?>-
                       <?php endif; ?>
                     </td>
-                    <td class="text-sm text-gray-800">
+                    <td class="py-4 px-4 text-right text-gray-900 font-mono">
                       <?php if ($row['kolesterol_total_mgdl'] !== null && $row['kolesterol_total_mgdl'] !== ''): ?>
-                        <?= (int)$row['kolesterol_total_mgdl'] ?> mg/dL
+                        <?= (int)$row['kolesterol_total_mgdl'] ?> <span class="text-gray-500">mg/dL</span>
                         <?php if ($row['kolesterol_total_kategori']): ?>
-                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                          <span class="block mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                             <?= htmlspecialchars($row['kolesterol_total_kategori']) ?>
                           </span>
                         <?php endif; ?>
                       <?php else: ?>-
                       <?php endif; ?>
                     </td>
-                    <td class="text-sm text-gray-800">
+                    <td class="py-4 pl-4 text-right text-gray-900 font-mono">
                       <?php if ($row['asam_urat_mgdl']): ?>
-                        <?= htmlspecialchars($row['asam_urat_mgdl']) ?> mg/dL
+                        <?= htmlspecialchars($row['asam_urat_mgdl']) ?> <span class="text-gray-500">mg/dL</span>
                         <?php if ($row['asam_urat_kategori']): ?>
-                          <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span class="block mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             <?= htmlspecialchars($row['asam_urat_kategori']) ?>
                           </span>
                         <?php endif; ?>
@@ -219,12 +261,12 @@ try {
             <?php foreach(($riwayat ?? []) as $row): ?>
               <div class="p-4 border border-gray-200 rounded-lg bg-white">
                 <div class="flex items-start justify-between gap-2">
-                  <div class="text-sm font-semibold text-gray-900">
+                  <div class="text-sm font-semibold text-gray-900 font-mono">
                     <?= htmlspecialchars((new DateTime($row['tgl_periksa']))->format('d M Y H:i')) ?>
                   </div>
                   <?php if ($row['sistolik'] && $row['diastolik']): ?>
                     <div class="text-right">
-                      <div class="text-xs text-gray-700">TD: <?= (int)$row['sistolik'] ?>/<?= (int)$row['diastolik'] ?></div>
+                      <div class="text-xs text-gray-700 font-mono">TD: <?= (int)$row['sistolik'] ?>/<?= (int)$row['diastolik'] ?> <span class="text-gray-500">mmHg</span></div>
                       <?php if (!empty($row['tekanan_darah_kategori'])): ?>
                         <span class="inline-flex mt-1 items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
                           <?= htmlspecialchars($row['tekanan_darah_kategori']) ?>
@@ -238,7 +280,7 @@ try {
                 <?php endif; ?>
                 <div class="mt-2 text-xs text-gray-700 grid grid-cols-2 gap-2">
                   <div>
-                    BMI: <?= $row['bmi'] ? htmlspecialchars($row['bmi']) : '-' ?>
+                    BMI: <span class="font-mono text-gray-900"><?= $row['bmi'] ? htmlspecialchars($row['bmi']) : '-' ?></span>
                     <?php if (!empty($row['bmi_kategori'])): ?>
                       <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-800 whitespace-nowrap">
                         <?= htmlspecialchars($row['bmi_kategori']) ?>
@@ -246,20 +288,23 @@ try {
                     <?php endif; ?>
                   </div>
                   <div>
-                    Gula: <?= $row['gula_mgdl'] ? (int)$row['gula_mgdl'] . ' mg/dL' : '-' ?>
-                    <?php if (!empty($row['gula_tipe'])): ?>
-                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 whitespace-nowrap">
-                        <?= htmlspecialchars(strtoupper($row['gula_tipe'])) ?>
-                      </span>
-                    <?php endif; ?>
+                    Gula: <span class="font-mono text-gray-900"><?= $row['gula_mgdl'] ? (int)$row['gula_mgdl'] . ' mg/dL' : '-' ?></span>
                     <?php if (!empty($row['gula_kategori'])): ?>
-                      <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 whitespace-nowrap">
-                        <?= htmlspecialchars($row['gula_kategori']) ?>
-                      </span>
+                      <div class="mt-1 text-[11px] text-gray-600">Kategori: 
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 whitespace-nowrap">
+                          <?= htmlspecialchars($row['gula_kategori']) ?>
+                        </span>
+                      </div>
+                    <?php endif; ?>
+                    <?php 
+                      $t = strtolower(trim((string)($row['gula_tipe'] ?? '')));
+                      $gexp = ($t==='puasa') ? 'Pemeriksaan setelah puasa ≥ 8 jam' : (($t==='sewaktu') ? 'Pemeriksaan sewaktu/acak tanpa persiapan' : (($t==='2jpp'||$t==='2hpp'||$t==='pp2'||$t==='2jampp') ? 'Pemeriksaan 2 jam setelah makan (postprandial)' : null));
+                      if ($t): ?>
+                        <div class="mt-1 text-[11px] text-gray-500">Tipe: <span class="font-medium text-amber-700"><?= htmlspecialchars(strtoupper($t)) ?></span><?php if($gexp): ?> — <?= htmlspecialchars($gexp) ?><?php endif; ?></div>
                     <?php endif; ?>
                   </div>
                   <div>
-                    Kol: <?= ($row['kolesterol_total_mgdl']!==null && $row['kolesterol_total_mgdl']!=='') ? (int)$row['kolesterol_total_mgdl'] . ' mg/dL' : '-' ?>
+                    Kol: <span class="font-mono text-gray-900"><?= ($row['kolesterol_total_mgdl']!==null && $row['kolesterol_total_mgdl']!=='') ? (int)$row['kolesterol_total_mgdl'] . ' mg/dL' : '-' ?></span>
                     <?php if (!empty($row['kolesterol_total_kategori'])): ?>
                       <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-100 text-indigo-800 whitespace-nowrap">
                         <?= htmlspecialchars($row['kolesterol_total_kategori']) ?>
@@ -267,7 +312,7 @@ try {
                     <?php endif; ?>
                   </div>
                   <div>
-                    Asam: <?= $row['asam_urat_mgdl'] ? htmlspecialchars($row['asam_urat_mgdl']) . ' mg/dL' : '-' ?>
+                    Asam: <span class="font-mono text-gray-900"><?= $row['asam_urat_mgdl'] ? htmlspecialchars($row['asam_urat_mgdl']) . ' mg/dL' : '-' ?></span>
                     <?php if (!empty($row['asam_urat_kategori'])): ?>
                       <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 whitespace-nowrap">
                         <?= htmlspecialchars($row['asam_urat_kategori']) ?>
@@ -279,6 +324,239 @@ try {
             <?php endforeach; ?>
           </div>
         <?php endif; ?>
+        </div>
+
+        <!-- Ringkasan Tren (kanan) -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 lg:p-8 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l4 4L17 6" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 leading-tight">Ringkasan Tren</h3>
+          </div>
+          <?php 
+            $latest = ($riwayat[0] ?? null);
+            $prev   = ($riwayat[1] ?? null);
+            $hasTwo = $latest && $prev;
+            $cmp = function($a, $b) {
+              if ($a === null || $a === '' || $b === null || $b === '') return null;
+              if (!is_numeric($a)) $a = (float)$a;
+              if (!is_numeric($b)) $b = (float)$b;
+              if ($b == $a) return 'tetap';
+              return ($b > $a) ? 'naik' : 'turun';
+            };
+            $arrow = function($status) {
+              if ($status === 'naik')   return '<span class="inline-flex items-center gap-1 text-red-600"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-5 5m5-5l5 5"/></svg>naik</span>';
+              if ($status === 'turun')  return '<span class="inline-flex items-center gap-1 text-green-600"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l5-5m-5 5l-5-5"/></svg>turun</span>';
+              return '<span class="inline-flex items-center gap-1 text-gray-600"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16"/></svg>tetap</span>';
+            };
+          ?>
+          <?php if (!$hasTwo): ?>
+            <p class="text-sm text-gray-600">Belum cukup data untuk ringkasan tren. Tambahkan minimal dua pemeriksaan.</p>
+          <?php else: ?>
+            <?php 
+              $num = function($v, int $precision = 1) {
+                if ($v === null || $v === '') return null;
+                return round((float)$v, $precision);
+              };
+              $trendBadge = function($pv, $cv, string $unit = '', int $precision = 1) use ($cmp, $arrow, $num) {
+                $p = $num($pv, $precision); $c = $num($cv, $precision);
+                if ($p === null || $c === null) return '<span class="text-gray-500">n/a</span>';
+                $status = $cmp($p, $c);
+                $delta = $c - $p; $fmt = ($precision === 0) ? (string)intval(round($delta)) : number_format($delta, $precision, '.', '');
+                $sign = ($delta > 0 ? '+' : ($delta < 0 ? '' : '±'));
+                return $arrow($status) . ' <span class="text-gray-500">(' . $sign . $fmt . ($unit ? ' ' . $unit : '') . ')</span>';
+              };
+              $esc = function($s){ return htmlspecialchars((string)$s); };
+              // Badge kategori dengan warna sesuai metrik (konsisten dengan tabel)
+              $badge = function(string $label, string $color) use ($esc) {
+                $map = [
+                  'blue'   => 'bg-blue-100 text-blue-800',      // Tekanan darah
+                  'purple' => 'bg-purple-100 text-purple-800',  // BMI
+                  'amber'  => 'bg-amber-100 text-amber-800',    // Gula
+                  'indigo' => 'bg-indigo-100 text-indigo-800',  // Kolesterol total
+                  'green'  => 'bg-green-100 text-green-800',    // Asam urat
+                  'gray'   => 'bg-gray-100 text-gray-800',
+                ];
+                $cls = $map[$color] ?? $map['gray'];
+                return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium '.$cls.'">'.$esc($label).'</span>';
+              };
+              $catChange = function($prevCat, $currCat, string $color = 'gray') use ($badge){
+                if (!$prevCat && !$currCat) return '';
+                $p = $prevCat ? $badge($prevCat, $color) : '';
+                $c = $currCat ? $badge($currCat, $color) : '';
+                if ($prevCat && $currCat) {
+                  if ($prevCat === $currCat) {
+                    return '<div class="text-xs text-gray-600">Kategori: '.$c.' <span class="ml-1 text-gray-500">(tetap)</span></div>';
+                  }
+                  return '<div class="text-xs text-gray-600">Kategori: '.$p.' <span class="mx-1 text-gray-400">→</span> '.$c.'</div>';
+                }
+                return '<div class="text-xs text-gray-600">Kategori: '.($c ?: $p).'</div>';
+              };
+
+              // Fokus kategori: tampilkan jelas prev → curr sebagai badge
+              $catCell = function($prevCat, $currCat, string $color = 'gray') use ($badge) {
+                if (!$prevCat && !$currCat) return '<span class="text-gray-400">-</span>';
+                $p = $prevCat ? $badge($prevCat, $color) : '<span class="text-gray-400">-</span>';
+                $c = $currCat ? $badge($currCat, $color) : '<span class="text-gray-400">-</span>';
+                if ($prevCat && $currCat) {
+                  if ($prevCat === $currCat) {
+                    return '<div class="flex items-center gap-2">'.$c.'<span class="text-xs text-gray-500">(tetap)</span></div>';
+                  }
+                  return '<div class="flex items-center gap-2">'.$p.'<span class="text-gray-400">→</span>'.$c.'</div>';
+                }
+                return '<div class="flex items-center gap-2">'.$p.'<span class="text-gray-400">→</span>'.$c.'</div>';
+              };
+
+              // Versi ringkas untuk nilai perubahan (tanpa simbol aneh saat 0)
+              $trendBadge2 = function($pv, $cv, string $unit = '', int $precision = 1) use ($cmp, $arrow) {
+                $toNum = function($v, int $precision = 1) {
+                  if ($v === null || $v === '') return null;
+                  return round((float)$v, $precision);
+                };
+                $p = $toNum($pv, $precision); $c = $toNum($cv, $precision);
+                if ($p === null || $c === null) return '<span class="text-gray-500">n/a</span>';
+                $status = $cmp($p, $c);
+                $delta = $c - $p;
+                $fmt = ($precision === 0) ? (string)intval(round($delta)) : number_format($delta, $precision, '.', '');
+                $sign = ($delta > 0 ? '+' : ($delta < 0 ? '' : ''));
+                return $arrow($status) . ' <span class="text-gray-500">(' . $sign . $fmt . ($unit ? ' ' . $unit : '') . ')</span>';
+              };
+            ?>
+            <div class="space-y-6 text-sm hidden">
+              <!-- TD split: Sistolik & Diastolik -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="text-gray-700 font-medium">TD (mmHg) — Sistolik</div>
+                  <div class="text-right text-gray-900">
+                    <div class="font-mono">Sebelumnya: <?= ($prev['sistolik'] ?? null) ? intval($prev['sistolik']).' mmHg' : '-' ?></div>
+                    <div class="font-mono">Terbaru: <?= ($latest['sistolik'] ?? null) ? intval($latest['sistolik']).' mmHg' : '-' ?></div>
+                    <div class="mt-1"><?= $trendBadge($prev['sistolik'] ?? null, $latest['sistolik'] ?? null, 'mmHg', 0) ?></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="text-gray-700 font-medium">TD (mmHg) — Diastolik</div>
+                  <div class="text-right text-gray-900">
+                    <div class="font-mono">Sebelumnya: <?= ($prev['diastolik'] ?? null) ? intval($prev['diastolik']).' mmHg' : '-' ?></div>
+                    <div class="font-mono">Terbaru: <?= ($latest['diastolik'] ?? null) ? intval($latest['diastolik']).' mmHg' : '-' ?></div>
+                    <div class="mt-1"><?= $trendBadge($prev['diastolik'] ?? null, $latest['diastolik'] ?? null, 'mmHg', 0) ?></div>
+                  </div>
+                </div>
+                <?= $catChange($prev['tekanan_darah_kategori'] ?? null, $latest['tekanan_darah_kategori'] ?? null, 'blue') ?>
+              </div>
+
+              <!-- BMI -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="text-gray-700 font-medium">BMI</div>
+                <div class="text-right text-gray-900">
+                  <div class="font-mono">Sebelumnya: <?= ($prev['bmi'] ?? null) !== null ? $esc($prev['bmi']) : '-' ?></div>
+                  <div class="font-mono">Terbaru: <?= ($latest['bmi'] ?? null) !== null ? $esc($latest['bmi']) : '-' ?></div>
+                  <div class="mt-1"><?= $trendBadge($prev['bmi'] ?? null, $latest['bmi'] ?? null, '', 1) ?></div>
+                  <?= $catChange($prev['bmi_kategori'] ?? null, $latest['bmi_kategori'] ?? null, 'purple') ?>
+                </div>
+              </div>
+
+              <!-- Gula -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="text-gray-700 font-medium">Gula</div>
+                <div class="text-right text-gray-900">
+                  <div class="font-mono">Sebelumnya: <?= ($prev['gula_mgdl'] ?? null) !== null ? (intval($prev['gula_mgdl']).' mg/dL') : '-' ?></div>
+                  <div class="font-mono">Terbaru: <?= ($latest['gula_mgdl'] ?? null) !== null ? (intval($latest['gula_mgdl']).' mg/dL') : '-' ?></div>
+                  <div class="mt-1"><?= $trendBadge($prev['gula_mgdl'] ?? null, $latest['gula_mgdl'] ?? null, 'mg/dL', 0) ?></div>
+                  <?= $catChange($prev['gula_kategori'] ?? null, $latest['gula_kategori'] ?? null, 'amber') ?>
+                </div>
+              </div>
+
+              <!-- Kolesterol Total -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="text-gray-700 font-medium">Kolesterol Total</div>
+                <div class="text-right text-gray-900">
+                  <div class="font-mono">Sebelumnya: <?= ($prev['kolesterol_total_mgdl'] ?? null) !== null && $prev['kolesterol_total_mgdl'] !== '' ? (intval($prev['kolesterol_total_mgdl']).' mg/dL') : '-' ?></div>
+                  <div class="font-mono">Terbaru: <?= ($latest['kolesterol_total_mgdl'] ?? null) !== null && $latest['kolesterol_total_mgdl'] !== '' ? (intval($latest['kolesterol_total_mgdl']).' mg/dL') : '-' ?></div>
+                  <div class="mt-1"><?= $trendBadge($prev['kolesterol_total_mgdl'] ?? null, $latest['kolesterol_total_mgdl'] ?? null, 'mg/dL', 0) ?></div>
+                  <?= $catChange($prev['kolesterol_total_kategori'] ?? null, $latest['kolesterol_total_kategori'] ?? null, 'indigo') ?>
+                </div>
+              </div>
+
+              <!-- Asam Urat -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="text-gray-700 font-medium">Asam Urat</div>
+                <div class="text-right text-gray-900">
+                  <div class="font-mono">Sebelumnya: <?= ($prev['asam_urat_mgdl'] ?? null) !== null ? ($esc($prev['asam_urat_mgdl']).' mg/dL') : '-' ?></div>
+                  <div class="font-mono">Terbaru: <?= ($latest['asam_urat_mgdl'] ?? null) !== null ? ($esc($latest['asam_urat_mgdl']).' mg/dL') : '-' ?></div>
+                  <div class="mt-1"><?= $trendBadge($prev['asam_urat_mgdl'] ?? null, $latest['asam_urat_mgdl'] ?? null, 'mg/dL', 1) ?></div>
+                  <?= $catChange($prev['asam_urat_kategori'] ?? null, $latest['asam_urat_kategori'] ?? null, 'green') ?>
+                </div>
+              </div>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-gray-200 p-4">
+              <table class="min-w-full table-auto text-sm md:text-base">
+                <thead class="bg-gray-50">
+                  <tr class="text-left text-xs uppercase tracking-wide text-gray-500">
+                    <th class="py-3 pr-6 font-semibold">Metrik</th>
+                    <th class="py-3 px-6 text-right font-semibold">Sebelumnya</th>
+                    <th class="py-3 px-6 text-right font-semibold">Terbaru</th>
+                    <th class="py-3 px-6 font-semibold">Perubahan</th>
+                    <th class="py-3 pl-6 w-60 font-semibold text-left">Kategori</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">TD Sistolik (mmHg)</td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($prev['sistolik'] ?? null) ? intval($prev['sistolik']).' mmHg' : '-' ?></td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($latest['sistolik'] ?? null) ? intval($latest['sistolik']).' mmHg' : '-' ?></td>
+                    <td class="py-3 px-6 text-gray-900 whitespace-nowrap"><?= $trendBadge2($prev['sistolik'] ?? null, $latest['sistolik'] ?? null, 'mmHg', 0) ?></td>
+                    <td class="py-3 pl-6 text-left"></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">TD Diastolik (mmHg)</td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($prev['diastolik'] ?? null) ? intval($prev['diastolik']).' mmHg' : '-' ?></td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($latest['diastolik'] ?? null) ? intval($latest['diastolik']).' mmHg' : '-' ?></td>
+                    <td class="py-3 px-6 text-gray-900 whitespace-nowrap"><?= $trendBadge2($prev['diastolik'] ?? null, $latest['diastolik'] ?? null, 'mmHg', 0) ?></td>
+                    <td class="py-3 pl-6 text-left"></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">TD (Kategori)</td>
+                    <td class="py-3 px-6"></td>
+                    <td class="py-3 px-6"></td>
+                    <td class="py-3 px-6"></td>
+                    <td class="py-3 pl-6 text-left whitespace-nowrap"><div class="min-w-[220px]"><?= $catCell($prev['tekanan_darah_kategori'] ?? null, $latest['tekanan_darah_kategori'] ?? null, 'blue') ?></div></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">BMI</td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($prev['bmi'] ?? null) !== null ? htmlspecialchars((string)$prev['bmi']) : '-' ?></td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($latest['bmi'] ?? null) !== null ? htmlspecialchars((string)$latest['bmi']) : '-' ?></td>
+                    <td class="py-3 px-6 text-gray-900 whitespace-nowrap"><?= $trendBadge2($prev['bmi'] ?? null, $latest['bmi'] ?? null, '', 1) ?></td>
+                    <td class="py-3 pl-6 text-left whitespace-nowrap"><div class="min-w-[220px]"><?= $catCell($prev['bmi_kategori'] ?? null, $latest['bmi_kategori'] ?? null, 'purple') ?></div></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">Gula (mg/dL)</td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($prev['gula_mgdl'] ?? null) !== null ? (intval($prev['gula_mgdl']).' mg/dL') : '-' ?></td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($latest['gula_mgdl'] ?? null) !== null ? (intval($latest['gula_mgdl']).' mg/dL') : '-' ?></td>
+                    <td class="py-3 px-6 text-gray-900 whitespace-nowrap"><?= $trendBadge2($prev['gula_mgdl'] ?? null, $latest['gula_mgdl'] ?? null, 'mg/dL', 0) ?></td>
+                    <td class="py-3 pl-6 text-left whitespace-nowrap"><div class="min-w-[220px]"><?= $catCell($prev['gula_kategori'] ?? null, $latest['gula_kategori'] ?? null, 'amber') ?></div></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">Kolesterol Total (mg/dL)</td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($prev['kolesterol_total_mgdl'] ?? null) !== null && $prev['kolesterol_total_mgdl'] !== '' ? (intval($prev['kolesterol_total_mgdl']).' mg/dL') : '-' ?></td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($latest['kolesterol_total_mgdl'] ?? null) !== null && $latest['kolesterol_total_mgdl'] !== '' ? (intval($latest['kolesterol_total_mgdl']).' mg/dL') : '-' ?></td>
+                    <td class="py-3 px-6 text-gray-900 whitespace-nowrap"><?= $trendBadge2($prev['kolesterol_total_mgdl'] ?? null, $latest['kolesterol_total_mgdl'] ?? null, 'mg/dL', 0) ?></td>
+                    <td class="py-3 pl-6 text-left whitespace-nowrap"><div class="min-w-[220px]"><?= $catCell($prev['kolesterol_total_kategori'] ?? null, $latest['kolesterol_total_kategori'] ?? null, 'indigo') ?></div></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 align-middle">
+                    <td class="py-3 pr-6 text-gray-700 font-medium">Asam Urat (mg/dL)</td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($prev['asam_urat_mgdl'] ?? null) !== null ? (htmlspecialchars((string)$prev['asam_urat_mgdl']).' mg/dL') : '-' ?></td>
+                    <td class="py-3 px-6 font-mono text-right text-gray-900 whitespace-nowrap"><?= ($latest['asam_urat_mgdl'] ?? null) !== null ? (htmlspecialchars((string)$latest['asam_urat_mgdl']).' mg/dL') : '-' ?></td>
+                    <td class="py-3 px-6 text-gray-900 whitespace-nowrap"><?= $trendBadge2($prev['asam_urat_mgdl'] ?? null, $latest['asam_urat_mgdl'] ?? null, 'mg/dL', 1) ?></td>
+                    <td class="py-3 pl-6 text-left whitespace-nowrap"><div class="min-w-[220px]"><?= $catCell($prev['asam_urat_kategori'] ?? null, $latest['asam_urat_kategori'] ?? null, 'green') ?></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          <?php endif; ?>
+        </div>
       </div>
 
       <!-- Action Section -->
@@ -303,68 +581,29 @@ try {
         </div>
       </div>
     </div>
-    <!-- ID Unik Card -->
-    <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-200">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0z" />
-          </svg>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-900 leading-tight">ID Unik Lansia</h2>
-      </div>
-      
-      <div class="space-y-6">
-        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200">
-          <div class="text-sm font-medium text-indigo-700 mb-3 leading-relaxed">Kode Identifikasi</div>
-          <div id="unikCode" class="font-mono text-2xl lg:text-3xl font-bold tracking-wider text-indigo-900 select-all break-all leading-tight">
-            <?= htmlspecialchars($l['id_unik']) ?>
-          </div>
-        </div>
-        
-        <div class="flex flex-col sm:flex-row gap-3">
-          <button type="button" id="copyUnikBtn" 
-                  class="btn btn-info btn-micro inline-flex items-center justify-center px-4 py-3 text-white font-semibold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex-1" 
-                  aria-live="polite">
-            <svg id="iconCopy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-            </svg>
-            <span id="copyUnikText">Salin ID</span>
-          </button>
-        </div>
-        
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <div class="flex items-start gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-            </svg>
-            <div>
-              <div class="text-sm font-medium text-amber-800 mb-1 leading-relaxed">Cara Penggunaan</div>
-              <div class="text-sm text-amber-700 leading-relaxed">Gunakan ID unik ini untuk mencari dan mengidentifikasi profil lansia dalam sistem.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <script>
-        (function(){
-          const btn = document.getElementById('copyUnikBtn');
-          const codeEl = document.getElementById('unikCode');
-          if(!btn || !codeEl) return;
-          btn.addEventListener('click', function(){
-            const txt = codeEl.textContent.trim();
-            if (navigator.clipboard && txt) {
-              navigator.clipboard.writeText(txt).then(()=>{
-                // Use enhanced success state with better UX
-                window.loadingManager.setButtonSuccess(btn, 'Tersalin!', 1500);
-                haptic(10);
-              }).catch(()=>{
-                window.loadingManager.setButtonError(btn, 'Gagal Salin', 2000);
-                haptic(20);
-              });
-            }
-          });
-        })();
-      </script>
-    </div>
+    
   </div>
 </div>
+<script>
+  (function(){
+    const btn = document.getElementById('copyUnikBtnInline');
+    const codeEl = document.getElementById('unikCodeInline');
+    if(!btn || !codeEl) return;
+    btn.addEventListener('click', function(){
+      const txt = codeEl.textContent.trim();
+      if (navigator.clipboard && txt) {
+        navigator.clipboard.writeText(txt).then(()=>{
+          if (window.loadingManager && window.loadingManager.setButtonSuccess) {
+            window.loadingManager.setButtonSuccess(btn, 'Tersalin!', 1500);
+          }
+          try { if (typeof haptic === 'function') haptic(10); } catch(e) {}
+        }).catch(()=>{
+          if (window.loadingManager && window.loadingManager.setButtonError) {
+            window.loadingManager.setButtonError(btn, 'Gagal Salin', 2000);
+          }
+          try { if (typeof haptic === 'function') haptic(20); } catch(e) {}
+        });
+      }
+    });
+  })();
+</script>
