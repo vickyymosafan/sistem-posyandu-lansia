@@ -1792,6 +1792,7 @@
           <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?>" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
           <a href="/find" class="<?= $linkCls($isActive('/find')) ?>" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
           <?php if ($isAdmin): ?>
+            <a href="/petugas" class="<?= $linkCls($isActive('/petugas')) ?>" aria-current="<?= $isActive('/petugas') ? 'page' : 'false' ?>">Data Petugas</a>
             <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?>" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
           <?php endif; ?>
         <?php endif; ?>
@@ -1842,6 +1843,7 @@
           <a href="/lansia/create" class="<?= $linkCls($isActive('/lansia/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/lansia/create') ? 'page' : 'false' ?>">Pendaftaran</a>
           <a href="/find" class="<?= $linkCls($isActive('/find')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/find') ? 'page' : 'false' ?>">Cari ID</a>
           <?php if ($isAdmin): ?>
+            <a href="/petugas" class="<?= $linkCls($isActive('/petugas')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/petugas') ? 'page' : 'false' ?>">Data Petugas</a>
             <a href="/petugas/create" class="<?= $linkCls($isActive('/petugas/create')) ?> block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg" tabindex="-1" aria-current="<?= $isActive('/petugas/create') ? 'page' : 'false' ?>">Petugas Baru</a>
           <?php endif; ?>
           <div class="pt-2 flex gap-2">

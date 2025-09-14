@@ -82,4 +82,53 @@ class User
         $st = $pdo->prepare('UPDATE users SET password_hash = :h, updated_at = NOW() WHERE id = :id');
         $st->execute([':h' => $hash, ':id' => $id]);
     }
+
+    public static function paginatePetugas(int $page = 1, int $perPage = 20, ?string $q = null): array
+    {
+        $page = max(1, $page);
+        $perPage = max(1, min(100, $perPage));
+        $offset = ($page - 1) * $perPage;
+
+        $pdo = Database::pdo();
+
+        $where = "WHERE role = 'petugas'";
+        $params = [];
+        if ($q !== null && trim($q) !== '') {
+            $qLike = '%' . $q . '%';
+            $where .= ' AND nama LIKE :q1';
+            $params[':q1'] = $qLike;
+        }
+
+        $stmt = $pdo->prepare("SELECT COUNT(*) AS c FROM users $where");
+        $stmt->execute($params);
+        $total = (int)($stmt->fetch(PDO::FETCH_ASSOC)['c'] ?? 0);
+
+        $sql = "SELECT id, nama, aktif, created_at, updated_at FROM users $where ORDER BY created_at DESC LIMIT :lim OFFSET :off";
+        $stmt = $pdo->prepare($sql);
+        foreach ($params as $k => $v) { $stmt->bindValue($k, $v, PDO::PARAM_STR); }
+        $stmt->bindValue(':lim', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':off', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        $pages = (int)max(1, (int)ceil($total / $perPage));
+        if ($page > $pages) { $page = $pages; }
+
+        return [
+            'items' => $items,
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'pages' => $pages,
+        ];
+    }
+
+    public static function deletePetugas(int $id): bool
+    {
+        if ($id <= 0) return false;
+        $pdo = Database::pdo();
+        $st = $pdo->prepare("DELETE FROM users WHERE id = :id AND role = 'petugas' LIMIT 1");
+        $st->execute([':id' => $id]);
+        return $st->rowCount() > 0;
+    }
 }

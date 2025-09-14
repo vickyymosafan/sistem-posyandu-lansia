@@ -83,6 +83,8 @@ $router->get('/find', [App\Controllers\FindController::class, 'index']);
 $router->post('/find', [App\Controllers\FindController::class, 'submit']);
 
 // Petugas management (admin only)
+$router->post('/petugas/{id}/hapus', [App\Controllers\PetugasController::class, 'destroy']);
+$router->get('/petugas', [App\Controllers\PetugasController::class, 'index']);
 $router->get('/petugas/create', [App\Controllers\PetugasController::class, 'create']);
 $router->post('/petugas', [App\Controllers\PetugasController::class, 'store']);
 
