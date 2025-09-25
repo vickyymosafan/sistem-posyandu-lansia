@@ -9,20 +9,29 @@ try {
   $usiaText = null; 
 }
 ?>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
   <div class="grid gap-8 items-start lg:grid-cols-1">
     <div class="space-y-8">
+      <!-- Back Button (mobile-friendly, consistent with Daftar Lansia) -->
+      <div>
+        <a href="/lansia" onclick="haptic(); if (history.length>1) { history.back(); return false; }" class="inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+          </svg>
+          Kembali
+        </a>
+      </div>
       <!-- Profile Header Card -->
-      <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-200">
-        <div class="flex items-center gap-6 mb-8">
-          <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+      <div class="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-200">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 text-white">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
           </div>
           <div class="flex-1">
-            <h1 class="text-2xl font-bold text-gray-900 mb-2 leading-tight"><?= htmlspecialchars($l['nama_lengkap']) ?></h1>
-            <div class="flex flex-wrap items-center gap-3">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 leading-tight"><?= htmlspecialchars($l['nama_lengkap']) ?></h1>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
               <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 <?= $l['jk'] === 'L' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' ?>">
                 <?= $l['jk']==='L'?'Laki-laki':'Perempuan' ?>
               </span>
@@ -31,12 +40,12 @@ try {
               <?php endif; ?>
             </div>
             <!-- ID Unik inline -->
-            <div class="mt-3 flex flex-wrap items-center gap-3">
+            <div class="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
               <span class="text-sm text-gray-600">ID Unik:</span>
-              <span id="unikCodeInline" class="font-mono text-base font-semibold tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200 select-all">
+              <span id="unikCodeInline" class="font-mono text-sm sm:text-base font-semibold tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200 select-all break-all">
                 <?= htmlspecialchars($l['id_unik']) ?>
               </span>
-              <button type="button" id="copyUnikBtnInline" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">
+              <button type="button" id="copyUnikBtnInline" class="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 16.5V6.75A2.25 2.25 0 0110.25 4.5h6a2.25 2.25 0 012.25 2.25v9.75A2.25 2.25 0 0116.25 18.75h-6A2.25 2.25 0 018 16.5z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 7.5H6.75A2.25 2.25 0 004.5 9.75v9.75A2.25 2.25 0 006.75 21.75h9.75A2.25 2.25 0 0018.75 19.5V18"/>
@@ -48,7 +57,7 @@ try {
         </div>
         
         <!-- Personal Information Section -->
-        <div class="border-t border-gray-100 pt-8">
+        <div class="border-t border-gray-100 pt-6 sm:pt-8">
           <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Informasi Personal</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -142,10 +151,18 @@ try {
       </div>
       
       <!-- Riwayat Pemeriksaan + Ringkasan Tren -->
-      <!-- Stack vertically to avoid clipping; remove 2-column grid layout -->
+      <!-- Mobile tabs to shorten scroll; show both on md+ -->
+      <div class="md:hidden">
+        <div id="profileTabs" class="bg-white border border-gray-200 rounded-xl p-1 shadow-sm flex gap-1">
+          <button type="button" data-target="#section-riwayat" aria-selected="true" class="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">Riwayat</button>
+          <button type="button" data-target="#section-ringkasan" aria-selected="false" class="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-200">Ringkasan</button>
+        </div>
+      </div>
+
+      <!-- Stack vertically on desktop, tabbed on mobile -->
       <div class="space-y-6">
         <!-- Riwayat (kiri) -->
-        <div id="riwayat" class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+        <div id="section-riwayat" class="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 shadow-sm">
           <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Riwayat Pemeriksaan</h2>
           <?php if (empty($riwayat ?? [])): ?>
             <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">Belum ada riwayat pemeriksaan.</div>
@@ -327,7 +344,7 @@ try {
         </div>
 
         <!-- Ringkasan Tren (kanan) -->
-        <div class="bg-white border border-gray-200 rounded-xl p-6 lg:p-8 shadow-sm">
+        <div id="section-ringkasan" class="bg-white border border-gray-200 rounded-xl p-6 lg:p-8 shadow-sm hidden md:block">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5" aria-hidden="true">
@@ -491,7 +508,100 @@ try {
                 </div>
               </div>
             </div>
-            <div class="overflow-x-auto rounded-xl border border-gray-200 p-4">
+
+            <!-- Mobile-friendly cards for trend summary -->
+            <div class="md:hidden space-y-3">
+              <!-- TD Sistolik -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="text-gray-700 font-medium">TD Sistolik (mmHg)</div>
+                  <div class="text-right font-mono text-gray-900 whitespace-nowrap">
+                    <?= ($prev['sistolik'] ?? null) ? intval($prev['sistolik']).' mmHg' : '-' ?>
+                    <span class="text-gray-400">→</span>
+                    <?= ($latest['sistolik'] ?? null) ? intval($latest['sistolik']).' mmHg' : '-' ?>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-700"><?= $trendBadge2($prev['sistolik'] ?? null, $latest['sistolik'] ?? null, 'mmHg', 0) ?></div>
+              </div>
+
+              <!-- TD Diastolik -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="text-gray-700 font-medium">TD Diastolik (mmHg)</div>
+                  <div class="text-right font-mono text-gray-900 whitespace-nowrap">
+                    <?= ($prev['diastolik'] ?? null) ? intval($prev['diastolik']).' mmHg' : '-' ?>
+                    <span class="text-gray-400">→</span>
+                    <?= ($latest['diastolik'] ?? null) ? intval($latest['diastolik']).' mmHg' : '-' ?>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-700"><?= $trendBadge2($prev['diastolik'] ?? null, $latest['diastolik'] ?? null, 'mmHg', 0) ?></div>
+              </div>
+
+              <!-- TD Kategori -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="text-gray-700 font-medium">TD (Kategori)</div>
+                <div class="mt-1"><?= $catCell($prev['tekanan_darah_kategori'] ?? null, $latest['tekanan_darah_kategori'] ?? null, 'blue') ?></div>
+              </div>
+
+              <!-- BMI -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="text-gray-700 font-medium">BMI</div>
+                  <div class="text-right font-mono text-gray-900 whitespace-nowrap">
+                    <?= ($prev['bmi'] ?? null) !== null ? htmlspecialchars((string)$prev['bmi']) : '-' ?>
+                    <span class="text-gray-400">→</span>
+                    <?= ($latest['bmi'] ?? null) !== null ? htmlspecialchars((string)$latest['bmi']) : '-' ?>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-700"><?= $trendBadge2($prev['bmi'] ?? null, $latest['bmi'] ?? null, '', 1) ?></div>
+                <div class="mt-1"><?= $catCell($prev['bmi_kategori'] ?? null, $latest['bmi_kategori'] ?? null, 'purple') ?></div>
+              </div>
+
+              <!-- Gula -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="text-gray-700 font-medium">Gula (mg/dL)</div>
+                  <div class="text-right font-mono text-gray-900 whitespace-nowrap">
+                    <?= ($prev['gula_mgdl'] ?? null) !== null ? (intval($prev['gula_mgdl']).' mg/dL') : '-' ?>
+                    <span class="text-gray-400">→</span>
+                    <?= ($latest['gula_mgdl'] ?? null) !== null ? (intval($latest['gula_mgdl']).' mg/dL') : '-' ?>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-700"><?= $trendBadge2($prev['gula_mgdl'] ?? null, $latest['gula_mgdl'] ?? null, 'mg/dL', 0) ?></div>
+                <div class="mt-1"><?= $catCell($prev['gula_kategori'] ?? null, $latest['gula_kategori'] ?? null, 'amber') ?></div>
+              </div>
+
+              <!-- Kolesterol Total -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="text-gray-700 font-medium">Kolesterol Total (mg/dL)</div>
+                  <div class="text-right font-mono text-gray-900 whitespace-nowrap">
+                    <?= ($prev['kolesterol_total_mgdl'] ?? null) !== null && $prev['kolesterol_total_mgdl'] !== '' ? (intval($prev['kolesterol_total_mgdl']).' mg/dL') : '-' ?>
+                    <span class="text-gray-400">→</span>
+                    <?= ($latest['kolesterol_total_mgdl'] ?? null) !== null && $latest['kolesterol_total_mgdl'] !== '' ? (intval($latest['kolesterol_total_mgdl']).' mg/dL') : '-' ?>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-700"><?= $trendBadge2($prev['kolesterol_total_mgdl'] ?? null, $latest['kolesterol_total_mgdl'] ?? null, 'mg/dL', 0) ?></div>
+                <div class="mt-1"><?= $catCell($prev['kolesterol_total_kategori'] ?? null, $latest['kolesterol_total_kategori'] ?? null, 'indigo') ?></div>
+              </div>
+
+              <!-- Asam Urat -->
+              <div class="p-4 border border-gray-200 rounded-xl bg-white">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="text-gray-700 font-medium">Asam Urat (mg/dL)</div>
+                  <div class="text-right font-mono text-gray-900 whitespace-nowrap">
+                    <?= ($prev['asam_urat_mgdl'] ?? null) !== null ? (htmlspecialchars((string)$prev['asam_urat_mgdl']).' mg/dL') : '-' ?>
+                    <span class="text-gray-400">→</span>
+                    <?= ($latest['asam_urat_mgdl'] ?? null) !== null ? (htmlspecialchars((string)$latest['asam_urat_mgdl']).' mg/dL') : '-' ?>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-700"><?= $trendBadge2($prev['asam_urat_mgdl'] ?? null, $latest['asam_urat_mgdl'] ?? null, 'mg/dL', 1) ?></div>
+                <div class="mt-1"><?= $catCell($prev['asam_urat_kategori'] ?? null, $latest['asam_urat_kategori'] ?? null, 'green') ?></div>
+              </div>
+            </div>
+
+            <!-- Desktop table for trend summary -->
+            <div class="hidden md:block overflow-x-auto rounded-xl border border-gray-200 p-4">
               <table class="min-w-full table-auto text-sm md:text-base">
                 <thead class="bg-gray-50">
                   <tr class="text-left text-xs uppercase tracking-wide text-gray-500">
@@ -560,7 +670,7 @@ try {
       </div>
 
       <!-- Action Section -->
-      <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+      <div class="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 shadow-sm">
         <h2 class="text-xl font-semibold text-gray-900 mb-6 leading-tight">Tindakan</h2>
         <div class="flex flex-col sm:flex-row gap-4">
           <a href="/lansia/<?= htmlspecialchars($l['id_unik']) ?>/pemeriksaan" 
@@ -605,5 +715,52 @@ try {
         });
       }
     });
+  })();
+
+  // Mobile tabs for Riwayat/Ringkasan
+  (function(){
+    const tabsWrap = document.getElementById('profileTabs');
+    const secRiwayat = document.getElementById('section-riwayat');
+    const secRingkasan = document.getElementById('section-ringkasan');
+    if (!tabsWrap || !secRiwayat || !secRingkasan) return;
+
+    const buttons = Array.from(tabsWrap.querySelectorAll('[data-target]'));
+    const activate = (targetId) => {
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches; // md
+      buttons.forEach(btn => {
+        const on = btn.getAttribute('data-target') === '#' + targetId;
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        btn.classList.toggle('bg-blue-600', on);
+        btn.classList.toggle('text-white', on);
+        btn.classList.toggle('bg-white', !on);
+        btn.classList.toggle('text-gray-700', !on);
+        btn.classList.toggle('border', !on);
+        btn.classList.toggle('border-gray-200', !on);
+      });
+
+      if (isDesktop) {
+        // Show both on desktop
+        secRiwayat.classList.remove('hidden');
+        secRingkasan.classList.remove('hidden');
+      } else {
+        // Only show the active one on mobile
+        (targetId === 'section-riwayat' ? secRiwayat : secRingkasan).classList.remove('hidden');
+        (targetId === 'section-riwayat' ? secRingkasan : secRiwayat).classList.add('hidden');
+      }
+    };
+
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-target').slice(1);
+      activate(target);
+      try { if (typeof haptic === 'function') haptic(8); } catch(e) {}
+    }));
+
+    const onResize = () => {
+      const selected = buttons.find(b => b.getAttribute('aria-selected') === 'true');
+      const active = (selected ? selected.getAttribute('data-target').slice(1) : 'section-riwayat');
+      activate(active);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+    onResize();
   })();
 </script>

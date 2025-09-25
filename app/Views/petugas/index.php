@@ -22,10 +22,10 @@ $error = $error ?? null;
       <p class="text-gray-600 mt-1">Daftar semua akun petugas yang terdaftar</p>
     </div>
 
-    <div class="flex items-center gap-3 w-full sm:w-auto">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
       <!-- Search Form -->
-      <form method="get" class="flex items-center gap-3 w-full sm:w-auto" onsubmit="return handleListSearchSubmit(this)" role="search" aria-label="Pencarian petugas">
-        <div class="relative flex-1 min-w-0 sm:flex-none sm:min-w-[260px] group">
+      <form method="get" class="flex items-center gap-3 w-full" onsubmit="return handleListSearchSubmit(this)" role="search" aria-label="Pencarian petugas">
+        <div class="relative flex-1 w-full min-w-[220px] sm:flex-none sm:min-w-[320px] group">
           <label for="searchInput" class="sr-only">Cari petugas</label>
           <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-150" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
@@ -74,7 +74,7 @@ $error = $error ?? null;
         </button>
       </form>
 
-      <a href="/petugas/create" class="btn btn-outline-primary whitespace-nowrap" onclick="haptic()">Tambah Petugas</a>
+      <a href="/petugas/create" class="btn btn-outline-primary whitespace-nowrap w-full sm:w-auto" onclick="haptic()">Tambah Petugas</a>
     </div>
   </div>
 
@@ -108,7 +108,8 @@ $error = $error ?? null;
       <?php endif; ?>
     </div>
 
-    <div class="overflow-x-auto">
+    <!-- Desktop table -->
+    <div class="hidden md:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200" role="table" aria-describedby="table-title">
         <thead class="bg-gray-50" role="rowgroup">
           <tr role="row">
@@ -172,6 +173,66 @@ $error = $error ?? null;
           <?php endforeach; endif; ?>
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden">
+      <?php if (empty($items)): ?>
+        <div class="px-6 py-12 text-center text-gray-500">
+          <div class="flex flex-col items-center gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-12 h-12 text-gray-300" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.5 7.5l13 9m-13 0l13-9" />
+            </svg>
+            <div class="text-center">
+              <h3 class="text-base font-semibold text-gray-900 mb-1">Belum ada data petugas</h3>
+              <p class="text-sm text-gray-600">Tambahkan melalui tombol "Tambah Petugas"</p>
+            </div>
+          </div>
+        </div>
+      <?php else: foreach ($items as $row): ?>
+        <div class="px-4 py-3">
+          <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700 text-sm font-semibold flex-shrink-0" aria-hidden="true">P</span>
+                <div class="truncate">
+                  <div class="text-sm font-semibold text-gray-900 truncate"><?= htmlspecialchars($row['nama']) ?></div>
+                </div>
+              </div>
+              <?php $aktif = (int)($row['aktif'] ?? 0) === 1; ?>
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 <?= $aktif ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700' ?>"
+                    aria-label="Status: <?= $aktif ? 'Aktif' : 'Nonaktif' ?>">
+                <?= $aktif ? 'Aktif' : 'Nonaktif' ?>
+              </span>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <div class="text-gray-500">Dibuat</div>
+                <div class="font-mono text-gray-900 text-sm">
+                  <time datetime="<?= htmlspecialchars($row['created_at']) ?>"><?= htmlspecialchars($row['created_at']) ?></time>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-gray-500">Diperbarui</div>
+                <div class="font-mono text-gray-900 text-sm">
+                  <time datetime="<?= htmlspecialchars($row['updated_at']) ?>"><?= htmlspecialchars($row['updated_at']) ?></time>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <form method="post" action="/petugas/<?= (int)$row['id'] ?>/hapus" onsubmit="return confirm('Yakin ingin menghapus petugas ini? Tindakan ini tidak dapat dibatalkan.');">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 text-white font-semibold text-sm shadow-sm hover:bg-red-700 transition-colors duration-150">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2h.293l.853 10.234A2 2 0 007.14 18h5.72a2 2 0 001.994-1.766L15.707 6H16a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0010 2H9zM8 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                  </svg>
+                  Hapus Petugas
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; endif; ?>
     </div>
 
     <?php if (($pages ?? 1) > 1): ?>
